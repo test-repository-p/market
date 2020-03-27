@@ -1,23 +1,25 @@
-@extends('layouts.app')
+@extends('admin.layouts.app')
+
+
+@section('header-title')
+<section class="content-header">
+    <h1>
+      داشبرد
+      <small> صفحه اصلی</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="{{ Route('home') }}"><i class="fa fa-dashboard"></i> خانه</a></li>
+      <li class="active"></li>
+    </ol>
+  </section>
+@endsection
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">Dashboard</div>
 
-                <div class="card-body">
-                    @if (session('status'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
-                        </div>
-                    @endif
 
-                    You are logged in!
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
+
+
+
+
 @endsection

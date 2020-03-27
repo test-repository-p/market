@@ -1,76 +1,80 @@
-@extends('layouts.app')
+<!doctype html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
-@section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Login') }}</div>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-                <div class="card-body">
-                    <form method="POST" action="{{ route('login') }}">
-                        @csrf
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-                        <div class="form-group row">
-                            <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('E-Mail Address') }}</label>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <link rel="stylesheet" href="{{ asset('user/logincss.css') }}">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!------ Include the above in your HEAD tag ---------->
 
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
+    <script src="https://code.jquery.com/jquery-2.1.0.min.js"></script>
+</head>
 
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
+<body>
+    <div id="formWrapper">
+        <a class="navbar-brand" style="margin-right:40px;float:right" href="{{ url('/') }}"> 
+            صفحه اصلی
+        </a>
+        <form method="POST" action="{{ route('login') }}">
+            @csrf
+            <div id="form">
+                <div class="form-item alert-danger " style="color:red">
+                    @error('email')
+                   <small>{{ $message }}</small>      
+                    @enderror
+                </div>
+                <div class="form-item alert-danger " style="color:red">
+                @error('password')
+                <small>{{ $message }}</small>      
+                    @enderror
+                </div>
+                <div class="logo">
+                    فرم ورود
+                </div>
+                <div class="form-item">
+                    <p class="formLabel">ایمیل</p>
+                    <input type="email" name="email" id="email" class="form-style @error('email') is-invalid @enderror"
+                        required autocomplete="email" autofocus autocomplete="off" />
+                </div>
+                <div class="form-item">
+                    <p class="formLabel">پسورد</p>
+                    <input type="password" name="password" id="password"
+                        class="form-style @error('password') is-invalid @enderror" required
+                        autocomplete="current-password" />
+                    <p class="p">
+                        <small style="margin-right:20px;color:#58bff6 "> {{ __(' مرابه خاطربسپار') }}</small><input
+                            class="form-check-input " type="checkbox" name="remember" id="remember"
+                            {{ old('remember') ? 'checked' : '' }}></p>
 
-                        <div class="form-group row">
-                            <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Password') }}</label>
+                    @if (Route::has('password.request'))
+                    <p class="p"><a
+                            href="{{ route('password.request') }}"><small>{{ __('فراموشی رمزعبور') }}</small></a></p>
+                    @endif
+                </div>
 
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
+                <div class="form-item">
+                    <p class="pull-left"><a href="{{ route('register') }}"><small>ثبت نام</small></a></p>
+                    <input type="submit" class="login pull-right" value="ورود">
 
-                                @error('password')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-md-6 offset-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-
-                                    <label class="form-check-label" for="remember">
-                                        {{ __('Remember Me') }}
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-0">
-                            <div class="col-md-8 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Login') }}
-                                </button>
-
-                                @if (Route::has('password.request'))
-                                    <a class="btn btn-link" href="{{ route('password.request') }}">
-                                        {{ __('Forgot Your Password?') }}
-                                    </a>
-                                @endif
-                                <a href="{{ url('login/google') }}" style="margin-top: 20px;" class="btn btn-lg btn-success btn-block">
-                                    <strong> ورود با گوگل</strong>
-                                  </a> 
-                            </div>
-                        </div>
-                    </form>
+                    <div class="clear-fix"></div>
+                    <a href="{{ url('login/google') }}" style="margin-top: 20px;"
+                        class="btn btn-lg btn-success btn-block">
+                        <small> ورود با گوگل</small>
+                    </a>
+                    
                 </div>
             </div>
-        </div>
+        </form>
     </div>
-</div>
-@endsection
+
+    <script src="{{ asset('user/loginjs.js') }}"></script>
+</body>
+
+</html>

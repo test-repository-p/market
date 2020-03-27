@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use App\User;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
 use Socialite;
 
 
@@ -43,6 +44,11 @@ class LoginController extends Controller
 
     
     //========================================================
+    protected function credentials(Request $request)
+    {
+        return ['email'=>$request->{$this->username()},'password'=>$request->password,'verified'=>'1'];
+    }
+
     public function redirectToProvider()
     {
         return Socialite::driver('google')->redirect();

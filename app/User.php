@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\Role;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -36,4 +37,44 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+
+    public function photos()
+    {
+        return $this->morphMany('App\Models\Photo',"photoable");
+    }
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
+    }
+    public function hasRole($role)
+    {
+        if(is_string($role))
+        {
+            return $this->roles->contains('name',$role);
+        }
+        foreach($role as $val)
+        {
+            if($this->hasRole($val->name))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public static function search($data)
+    {
+        $value = User::orderBy('id','DESC');
+        if(sizeof($data) > 0)
+        {
+            if(array_key_exists('name',$data))
+            {
+                $value = $value->where('name','like','%'.$data['name'].'%');
+            }
+        }
+
+        $value = $value->paginate(10);
+        return $value;
+    }
 }

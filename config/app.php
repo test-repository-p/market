@@ -168,6 +168,9 @@ return [
         //============================================
         Hekmatinasser\Verta\VertaServiceProvider::class,
         Laravel\Socialite\SocialiteServiceProvider::class,
+        Jrean\UserVerification\UserVerificationServiceProvider::class,
+        Yajra\DataTables\DataTablesServiceProvider::class,
+        Intervention\Image\ImageServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -231,6 +234,9 @@ return [
         //================================================
         'Verta' => Hekmatinasser\Verta\Verta::class,
         'Socialite' => Laravel\Socialite\Facades\Socialite::class,
+        'UserVerification' => Jrean\UserVerification\Facades\UserVerification::class,
+        'DataTables' => Yajra\DataTables\Facades\DataTables::class,
+        'Image' => Intervention\Image\Facades\Image::class,
 
     ],
 
