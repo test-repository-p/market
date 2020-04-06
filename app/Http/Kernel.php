@@ -63,6 +63,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         //====================================================================
         'isVerified' => \Jrean\UserVerification\Middleware\IsVerified::class,
+        'UserLevel' => \App\Http\Middleware\UserLevel::class,
     ];
 
     /**

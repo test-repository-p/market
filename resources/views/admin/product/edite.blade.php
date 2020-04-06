@@ -2,10 +2,7 @@
 
 @section('header-title')
 <section class="content-header">
-    <h1>
-        داشبرد
-        <small> محصولات</small>
-    </h1>
+   
     <ol class="breadcrumb">
         <li><a href="{{ Route('home') }}"><i class="fa fa-dashboard"></i> خانه</a></li>
         <li><a href="{{ Route('product.index') }}"><i class="fa fa-dashboard"></i> محصولات</a></li>
@@ -17,8 +14,11 @@
 @section('content')
 
 <section class="content">
+  
 
-      <div class="col-lg-8 connectedSortable ui-sortable">
+  <div class="row col-lg-9">
+
+      {{-- <div class="col-lg-8 connectedSortable ui-sortable"> --}}
         
         <div class="box-header with-border">
           <h3 class="box-title">ویرایش محصول  </h3>
@@ -75,14 +75,7 @@
             </div>
             @endif
              
-            <div class="form-group">
-              {!! Form::label('body', 'توضیحات', ['class'=>'col-sm-2 control-label']) !!}
-                <div class="col-sm-10">
-                {!! Form::textarea('body', old('body') ,['class'=>'form-control','rows'=>3]) !!}
-                </div>
-              </div>
-
-
+          
               <div class="form-group">
                 {!! Form::label('count', 'تعداد', ['class'=>'col-sm-2 control-label']) !!}
                   <div class="col-sm-10">
@@ -125,6 +118,36 @@
                 </div>
 
                 <div class="form-group">
+                  <div class="rating">
+                    <label for="inputrate" class="col-sm-2 control-label">امتیازدهی</label>
+                    <div class="col-sm-10">
+                  <input id="input-1" name="rate" class="rating rating-loading" data-min="0" data-max="5" data-step="1" value="{{ $product->userAverageRating }}" data-size="xs">
+                  {{-- <input type="hidden" name="id" required="" value="{{ $product->id }}"> --}}
+                  {{-- <span class="review-no">422 reviews</span> --}}
+                  <br/>
+                  {{-- <button class="btn btn-success">Submit Review</button> --}}
+              </div>
+            </div>
+          </div>
+          
+
+                @foreach ($attributes as $attribute)
+                <?php $id = $attribute->id;?>
+                <div class="form-group">
+                  {!! Form::label('id', $attribute->title, ['class'=>'col-sm-2 control-label']) !!}
+                  <div class="col-sm-10">
+                    <select class="form-control" id="selectbox" name="id[{{$id}}]">
+                      @foreach ($attribute->subcategories as $val)
+                      <option value="{{ $val->pivot->id }}">
+                        {{ $val->title }}->{{ $attribute->title }}->{{ $val->pivot->description }}
+                      </option>
+                      @endforeach
+                    </select>
+                  </div>
+                </div>
+                @endforeach
+                
+                <div class="form-group">
                   {!! Form::label('tag_id', ' کلمات کلیدی', ['class'=>'col-sm-2 control-label']) !!}
                     <div class="col-sm-10">
                       <strong>
@@ -161,8 +184,9 @@
               {!! Form::submit('انصراف',['class'=>'btn btn-default']) !!}
               {!! Form::submit('ذخیره',['class'=>'btn btn-info pull-right']) !!}
             </div>
+{!! Form::close() !!}
 
-
-
+          </div>
+          </div>
 </section>
 @endsection

@@ -171,6 +171,7 @@ return [
         Jrean\UserVerification\UserVerificationServiceProvider::class,
         Yajra\DataTables\DataTablesServiceProvider::class,
         Intervention\Image\ImageServiceProvider::class,
+        willvincent\Rateable\RateableServiceProvider::class,
 
         /*
          * Application Service Providers...

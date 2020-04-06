@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     protected $fillable = [
-        'name','chid',
+        'name','chid','title',
     ];
     public function tags()
     {
@@ -21,6 +21,11 @@ class Category extends Model
     {
         return $this->hasMany(Subcategory::class);
     }
+    public function article()
+    {
+        return $this->hasMany(Article::class);
+    }
+
     public static function search($data)
     {
         $category = Category::orderBy('id','DESC');

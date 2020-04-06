@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Subcategory extends Model
 {
     protected $fillable = [
-        'name','category_id',
+        'name','category_id','title','type','parent_id',
     ];
     public function category()
     {
@@ -15,7 +15,7 @@ class Subcategory extends Model
     }
     public function attributes()
     {
-        return $this->belongsToMany(Attribute::class);
+        return $this->belongsToMany(Attribute::class)->withPivot('description','id');
     }
     public function photos()
     {

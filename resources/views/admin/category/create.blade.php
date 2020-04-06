@@ -45,6 +45,21 @@
             @endif
 
             <div class="form-group">
+              {!! Form::label('title', 'عنوان  ', ['class'=>'col-sm-2 control-label']) !!}
+              <div class="col-sm-10">
+                {!! Form::text('title', old('title') ,['class'=>'form-control']) !!}
+              </div>
+            </div>
+            @if($errors->has('title'))
+            <div class="form-group">
+              <label for="inputname" class="col-sm-2 control-label"> </label>
+              <div class="col-sm-10">
+                <li class="form-control label-danger" id="inputname">{{ $errors->first('title') }}</li>
+              </div>
+            </div>
+            @endif
+
+            <div class="form-group">
               {!! Form::label('tag_id', ' کلمات کلیدی', ['class'=>'col-sm-2 control-label']) !!}
                 <div class="col-sm-10">
                 <select class="form-control" id="selectbox" name="tag_id[]" multiple>

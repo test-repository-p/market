@@ -61,8 +61,9 @@
                             <tr>
                                 <th>ردیف</th>
                                 <th>نام  </th>
-                                <th>تصویر  </th>
-                                <th>سرگروه </th>
+                                <th>عنوان  </th>
+                                <th>دسته بندی </th>
+                                <th>سرگروه  </th>
                                 <th>ویرایش</th>
                                 <th>حذف</th>
                             </tr>
@@ -71,12 +72,19 @@
                                 <td>{{ $subcategory->id }}</td>
                                 <td><a  href="{{ route('subcategory.show',['subcategory'=>$subcategory->id]) }}">{{ $subcategory->name }}</a>
                                 </td>
+                                <td>{{ $subcategory->title }}</td>
                                 <td>
-                                    {{ $subcategory->category->name }}
+                                    {{ $subcategory->category->title }}
                                 </td>
                                 <td>
-                                    @if($subcategory->photos()->first())
-                                    <img src="/{{ $subcategory->photos()->first()->path }}" style="max-width:60px;max-height:60px;height: auto;float: right;">
+                                   <?php
+                                    $id=$subcategory->parent_id;
+                                    $sub = \App\Models\Subcategory::where('id',$id)->first();
+                                    ?>
+                                    @if($id != 0)
+                                    {{ $sub->title }}
+                                    @else
+                                    -سرگروه-
                                     @endif
                                 </td>
                                 <td>

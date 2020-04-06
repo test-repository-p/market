@@ -2,6 +2,9 @@
 
 namespace App;
 
+use App\Models\Article;
+use App\Models\Basket;
+use App\Models\Comment;
 use App\Models\Role;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -46,6 +49,18 @@ class User extends Authenticatable
     public function roles()
     {
         return $this->belongsToMany(Role::class);
+    }
+    public function basket()
+    {
+        return $this->hasMany(Basket::class);
+    }
+    public function article()
+    {
+        return $this->hasMany(Article::class);
+    }
+    public function comment()
+    {
+        return $this->hasMany(Comment::class);
     }
     public function hasRole($role)
     {

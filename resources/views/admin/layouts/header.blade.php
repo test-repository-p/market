@@ -242,7 +242,7 @@
               <li class="user-body">
                 <div class="row">
                   <div class="col-xs-4 text-center">
-                    <a href="{{ Route('panel.index') }}">صفحه من</a>
+                    <a href="{{ url('/') }}"> سایت</a>
                   </div>
                   <div class="col-xs-4 text-center">
                     <a href="#">فروش</a>

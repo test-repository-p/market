@@ -38,10 +38,12 @@ class SliderController extends AdminController
      */
     public function store(Request $request)
     {
+        // var_dump($request['job']);die;
         $this->validate(request(),[
             'name' => 'required',
             'url' => 'required',
             'image' => 'required',
+            // 'text' =>'required',
         ]);
 
 
@@ -49,11 +51,12 @@ class SliderController extends AdminController
         $slider = Slider::create([
             'name' => $request['name'],
             'url' => $request['url'],
+            'text' => $request['text'],
         ]);
         
         $file = $request['image'];
         $path = 'sliders/';
-        $image = $this->ImageUploader($file,$path);
+        $image = $this->ImageResize($file,$path);
         $photo = new Photo;
         $photo->path = $image;
         $slider->photos()->save($photo);
@@ -96,6 +99,7 @@ class SliderController extends AdminController
         $this->validate(request(),[
             'name' => 'required',
             'url' => 'required',
+            // 'text' =>'required',
             // 'image' => 'required',
         ]);
         if($request['image'])
@@ -105,13 +109,13 @@ class SliderController extends AdminController
                 unlink($slider->photos()->first()->path) or die('Delete Error');
                 $file = $request['image'];
                 $path = 'sliders/';
-                $image = $this->ImageUploader($file,$path);
+                $image = $this->ImageResize($file,$path);
             }
             else
             {
                 $file = $request['image'];
                 $path = 'sliders/';
-                $image = $this->ImageUploader($file,$path);
+                $image = $this->ImageResize($file,$path);
                 $photo = new Photo;
                 $photo->path = $image;
                 $slider->photos()->save($photo);

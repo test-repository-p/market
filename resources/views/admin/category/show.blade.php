@@ -32,6 +32,10 @@
           <td>{{ $category->name }}</td>
         </tr>
         <tr>
+          <th>عنوان </th>
+          <td>{{ $category->title }}</td>
+        </tr>
+        <tr>
           <th>کلمات کلیدی</th>
           <td>
             @foreach($category->tags as $tag) 

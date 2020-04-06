@@ -17,7 +17,7 @@
 @section('content')
 
 <section class="content">
-
+<div class="row">
 <div class="col-xs-6">
     <p class="lead">جزییات</p>
 
@@ -44,6 +44,33 @@
           <td>{{ $product->countsale }}</td>
         </tr>
         <tr>
+          <th> دسته بندی</th>
+          <td>{{ $product->category->title }}</td>
+        </tr>
+        <tr>
+          <th>ویژگی ها</th>
+          <td>
+            @foreach ($product->attribute_subcategory as $item)
+            <?php
+            $sub = \App\Models\Subcategory::where('id',$item->subcategory_id)->get();
+            $att = \App\Models\Attribute::where('id',$item->attribute_id)->get();
+            foreach ($sub as $key) {
+            echo $key->title.'->';
+              
+            }
+            foreach ($att as $key) {
+            echo $key->title.'->';
+              
+            }
+         ?>
+                {{ $item->description }}
+               
+                <br>
+            @endforeach
+           
+          </td>
+        </tr>
+        <tr>
             <th>وضعیت</th>
             <td>                   
                <?php if($product->status == 0) echo "ناموجود"; else echo "موجود"; ?>
@@ -68,15 +95,22 @@
             </td>
           </tr> 
           <tr>
-            <th>تصویر</th>
-            <td><img src="/{{ $product->photos()->first()->path }}" alt=""></td>
-          </tr>
+            <th> امتیاز</th>
+            <td>
+          <input id="input-1" name="input-1" class="rating rating-loading" data-min="0" data-max="5" data-step="0.1" value="{{ $product->averageRating }}" data-size="xs" disabled="">
+              
+            </td>
+          </tr> 
+         
           
       
       </tbody>
     </table>
     </div>
   </div>
-
+  <div class="col-xs-6">
+    <img src="/{{ $product->photos()->first()->path }}" height="490px" alt="">
+  </div>
+</div>
 </section>
 @endsection

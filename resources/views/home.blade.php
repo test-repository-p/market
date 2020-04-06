@@ -17,9 +17,4 @@
 @section('content')
 
 
-
-
-
-
-
 @endsection

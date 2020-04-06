@@ -63,7 +63,8 @@
                         <tbody>
                             <tr>
                                 <th>ردیف</th>
-                                <th>نام  </th>
+                                <th>نام</th>
+                                <th>عنوان  </th>
                                 <th>کلمات کلیدی</th>
                                 <th>ویرایش</th>
                                 <th>حذف</th>
@@ -74,6 +75,7 @@
                                 <td>
                                     <a  href="{{ route('category.show',['category'=>$category->id]) }}">{{ $category->name }}</a>
                                 </td> 
+                                <td>{{ $category->title }}</td>
                                 <td>
                                     @if($category->tags)
                                     @foreach($category->tags as $tag) 

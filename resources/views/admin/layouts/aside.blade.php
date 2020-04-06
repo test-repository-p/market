@@ -32,8 +32,8 @@
       <ul class="sidebar-menu" data-widget="tree">
         <li class="header">منو</li>
      
-      
-      {{-- @can('user_manager') --}}
+      @if(auth()->user()->level=='admin')
+      @can('user_manager')
         <li class="treeview">
           <a href="#">
             <i class="fa fa-user"></i> <span> مدیریت کاربران</span>
@@ -50,7 +50,7 @@
             <li><a href="{{ Route('permission.create') }}"><i class="fa fa-circle-o text-aqua"></i>افزودن دسترسی جدید </a></li>
           </ul>
         </li>
-        {{-- @endcan --}}
+        @endcan
       @can('product_manager')
         <li class="treeview">
           <a href="#">
@@ -84,6 +84,11 @@
             <li><a href="{{ Route('attribute.index') }}"><i class="fa fa-circle-o text-aqua"></i>لیست ویژگی ها</a></li>
             <li><a href="{{ Route('attribute.create') }}"><i class="fa fa-circle-o text-aqua"></i>افزودن ویژگی جدید </a></li>
             @endcan
+            {{-- @can('attributevalue_manager') --}}
+            <li><a href="{{ Route('attributevalue.index') }}"><i class="fa fa-circle-o text-aqua"></i>لیست مقادیر ویژگی ها</a></li>
+            <li><a href="{{ Route('attributevalue.create') }}"><i class="fa fa-circle-o text-aqua"></i>افزودن مقدار جدید </a></li>
+            {{-- @endcan --}}
+            
           </ul>
         </li>
         @endcan
@@ -115,6 +120,63 @@
           </ul>
         </li>
         @endcan
+        {{-- @can('information_manager') --}}
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-info"></i> <span> مدیریت اطلاعات تماس</span>
+            <span class="pull-left-container">
+              <i class="fa fa-angle-right pull-left"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{{ Route('information.index') }}"><i class="fa fa-circle-o text-aqua"></i> اطلاعات تماس </a></li>
+        <li><a href="{{ Route('information.create') }}"><i class="fa fa-circle-o text-aqua"></i>افزودن اطلاعات تماس </a></li>
+          </ul>
+        </li>
+       {{-- @endcan --}}
+       {{-- @can('logo_manager') --}}
+       <li class="treeview">
+        <a href="#">
+          <i class="fa fa-image"></i> <span> مدیریت  لوگوسایت</span>
+          <span class="pull-left-container">
+            <i class="fa fa-angle-right pull-left"></i>
+          </span>
+        </a>
+        <ul class="treeview-menu">
+          <li><a href="{{ Route('logo.index') }}"><i class="fa fa-circle-o text-aqua"></i>لوگو  </a></li>
+      <li><a href="{{ Route('logo.create') }}"><i class="fa fa-circle-o text-aqua"></i>افزودن  لوگوجدید </a></li>
+        </ul>
+      </li>
+     {{-- @endcan --}}
+     {{-- @can('article_manager') --}}
+     <li class="treeview">
+      <a href="#">
+        <i class="fa fa-book"></i> <span> مدیریت  مقالات</span>
+        <span class="pull-left-container">
+          <i class="fa fa-angle-right pull-left"></i>
+        </span>
+      </a>
+      <ul class="treeview-menu">
+        <li><a href="{{ Route('article.index') }}"><i class="fa fa-circle-o text-aqua"></i>مقالات  </a></li>
+    <li><a href="{{ Route('article.create') }}"><i class="fa fa-circle-o text-aqua"></i>افزودن  مقاله جدید </a></li>
+      </ul>
+    </li>
+   {{-- @endcan --}}
+   {{-- @can('comment_manager') --}}
+   <li class="treeview">
+    <a href="#">
+      <i class="fa fa-envelope"></i> <span> مدیریت  کامنت ها</span>
+      <span class="pull-left-container">
+        <i class="fa fa-angle-right pull-left"></i>
+      </span>
+    </a>
+    <ul class="treeview-menu">
+      <li><a href="{{ Route('comment.index') }}"><i class="fa fa-circle-o text-aqua"></i>لیست کامنت ها  </a></li>
+  <li><a href="{{ Route('comment.create') }}"><i class="fa fa-circle-o text-aqua"></i>افزودن  کامنت جدید </a></li>
+    </ul>
+  </li>
+ {{-- @endcan --}}
+        @endif
       </ul>
     </section>
     <!-- /.sidebar -->

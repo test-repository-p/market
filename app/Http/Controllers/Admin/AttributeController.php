@@ -4,20 +4,18 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attribute;
-use App\Models\Photo;
-use App\Models\Subcategory;
 use Illuminate\Http\Request;
 
-class AttributeController extends Controller
+class AttributeController extends AdminController
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $attributes = Attribute::paginate(10);
+        $attributes = Attribute::search($request->all());
         return view('admin.attribute.index',compact('attributes'));
     }
 
@@ -28,8 +26,7 @@ class AttributeController extends Controller
      */
     public function create()
     {
-        $subcategorys = Subcategory::get();
-        return view('admin.attribute.create',compact('subcategorys'));
+        return view('admin.attribute.create');
     }
 
     /**
@@ -42,26 +39,17 @@ class AttributeController extends Controller
     {
         $this->validate(request(),[
             'name' => 'required',
-            'email' => 'required',
-            'password' => 'required',
-            // 'image' => 'required',
+            'title' => 'required',
         ]);
         $attribute = Attribute::create([
             'name' => $request['name'],
-            'email' => $request['email'],
-            'password' => bcrypt($request['password']),
+            'title' => $request['title'],
+            'parent_id' => 0,
+            
         ]);
-        $attribute->subcategorys()->sync($request->input('subcategory_id'));
+      
         
-        $file = $request['image'];
-        $path = 'attributes/';
-        $image = $this->ImageUploader($file,$path);
-        Photo::create([
-            'photoable_id' => $attribute->id,
-            'photoable_type' => 'App\Models\attribute',
-            'path' => $image,
-        ]);
-        session()->flash('msg','ذخیره  کاربر انجام شد');
+        session()->flash('msg','ذخیره  ویژگی انجام شد');
         return redirect(route('attribute.index'));
     }
 
@@ -73,8 +61,7 @@ class AttributeController extends Controller
      */
     public function show(Attribute $attribute)
     {
-        $subcategorys = Subcategory::get();
-        return view('admin.attribute.show',compact('attribute','subcategorys'));
+        return view('admin.attribute.show',compact('attribute'));
     }
 
     /**
@@ -85,8 +72,7 @@ class AttributeController extends Controller
      */
     public function edit(Attribute $attribute)
     {
-        $subcategorys = Subcategory::get();
-        return view('admin.attribute.edite',compact('attribute','subcategorys'));
+        return view('admin.attribute.edite',compact('attribute'));
     }
 
     /**
@@ -100,43 +86,13 @@ class AttributeController extends Controller
     {
         $this->validate(request(),[
             'name' => 'required',
-            'email' => 'required',
-            // 'image' => 'required',
+            'title' => 'required',
         ]);
-        if($request['image'])
-        {
-            if($attribute->photos()->first())
-            {
-                unlink($attribute->photos()->first()->path) or die('Delete Error');
-                $file = $request['image'];
-                $path = 'attributes/';
-                $image = $this->ImageUploader($file,$path);
-            }
-            else
-            {
-                $file = $request['image'];
-                $path = 'attributes/';
-                $image = $this->ImageUploader($file,$path);
-                Photo::create([
-                    'photoable_id' => $attribute->id,
-                    'photoable_type' => 'App\attribute',
-                    'path' => $image,
-                ]);
-            }
-        }
-        else
-        {
-            $image = $attribute->photos()->first()->path;
-        }
-        $photo = $attribute->photos()->first();
-        $photo->path = $image;
-        $photo->save();
-
+      
         $data = $request->all();    
         $attribute->update($data);
-        $attribute->subcategorys()->sync($request->input('subcategory_id'));
 
-        session()->flash('msg','تغییرات  کاربر انجام شد');
+        session()->flash('msg','تغییرات  ویژگی انجام شد');
         return redirect(route('attribute.index'));
     }
 
@@ -148,13 +104,8 @@ class AttributeController extends Controller
      */
     public function destroy(Attribute $attribute)
     {
-        $photo = $attribute->photos()->first();
-        $photo->photoable_id = 0;
-        $photo->photoable_type = "";
-        unlink($attribute->photos()->first()->path) or die('Delete Error');
-        $photo->save();
         $attribute->delete();
-        session()->flash('msg','  کاربر موردنظر حذف شد');
+        session()->flash('msg','  ویژگی موردنظر حذف شد');
         return redirect()->back();
     }
 }

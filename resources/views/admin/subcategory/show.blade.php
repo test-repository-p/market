@@ -32,15 +32,29 @@
           <td>{{ $subcategory->name }}</td>
         </tr>
         <tr>
-          <th>تصویر</th>
+          <th>عنوان </th>
+          <td>{{ $subcategory->title }}</td>
+        </tr>
+        <tr>
+          <th>توضیحات </th>
+          <td>{{ $subcategory->body }}</td>
+        </tr>
+        <tr>
+          <th>-سرگروه-</th>
           <td>
-            @if($subcategory->photos()->first())
-            <img src="/{{ $subcategory->photos()->first()->path }}" style="max-width:60px;max-height:60px;height: auto;float: right;">
+            <?php
+            $id=$subcategory->parent_id;
+            $sub = \App\Models\Subcategory::where('id',$id)->first();
+            ?>
+            @if($id != 0)
+            {{ $sub->title }}
+            @else
+            -سرگروه-
             @endif
           </td>
         </tr>
         <tr>
-          <th>سرگروه</th>
+          <th>دسته بندی</th>
           <td>
             {{ $subcategory->category->name }}
           </td>

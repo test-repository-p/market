@@ -4,7 +4,7 @@
 <section class="content-header">
     <ol class="breadcrumb">
         <li><a href="{{ Route('home') }}"><i class="fa fa-dashboard"></i> خانه</a></li>
-        <li class="active">  کاربران</li>
+        <li class="active">  ویژگی ها</li>
     </ol>
 </section>
 @endsection
@@ -32,35 +32,9 @@
         <!-- /.box -->
       </div>
       @endif
-
-    {{-- @if(session()->has('msg'))
-    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-success">
-        یک پیام دارید
-    </button>
-    <div class="modal modal-info fade" id="modal-success">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title"> پیغام</h4>
-                </div>
-                <div class="modal-body">
-                    <p>
-                        {{ session('msg')}}
-                    </p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">خروج</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    @endif --}}
-
     
     <div class="col-md-9">
-    <a class="btn btn-app bg-green" href="{{ Route('user.create') }}">
+    <a class="btn btn-app bg-green" href="{{ Route('attribute.create') }}">
         <i class="fa fa-save "></i> افزودن
     </a>
     </div>
@@ -69,16 +43,15 @@
         <div class="col-xs-12">
             <div class="box">
                 <div class="box-header">
-                    <h3 class="box-title">لیست  کاربران وب سایت </h3>
+                    <h3 class="box-title">لیست  ویژگی ها</h3>
 
                     <div class="box-tools">
-                        <div class="input-group input-group-sm" style="width: 150px;">
-                            <input type="text" name="table_search" class="form-control pull-right" placeholder="جستجو">
-
+                        <form class="input-group input-group-sm" style="width: 150px;">
+                            <input type="text" name="name" class="form-control pull-right" placeholder="جستجو">
                             <div class="input-group-btn">
                                 <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
                 <!-- /.box-header -->
@@ -88,36 +61,23 @@
                             <tr>
                                 <th>ردیف</th>
                                 <th>نام  </th>
-                                <th>ایمیل </th>
-                                <th>تصویر</th>
-                                <th>سطح دسترسی ها </th>
-                                <th>ویرایش سطح دسترسی</th>
+                                <th>عنوان  </th>
+                                <th>ویرایش</th>
                                 <th>حذف</th>
                             </tr>
-                            @foreach($users as $user)
+                            @foreach($attributes as $attribute)
                             <tr>
-                                <td>{{ $user->id }}</td>
-                                <td><a  href="{{ route('user.show',['user'=>$user->id]) }}">{{ $user->name }}</a>
+                                <td>{{ $attribute->id }}</td>
+                                <td><a  href="{{ route('attribute.show',['attribute'=>$attribute->id]) }}">{{ $attribute->name }}</a>
                                 </td>
-                                <td>{{ $user->email }}</td>
+                                <td>{{ $attribute->title }}</td>
                                 <td>
-                                    @if($user->photos()->first())
-                                    <img src="/{{ $user->photos()->first()->path }}" style="max-width:60px;max-height:60px;height: auto;float: right;">
-                                    @endif
-                                </td>
-                                <td>
-                                    @foreach ($user->roles as $role)
-                                    ({{ $role->title }}),
-                                    @endforeach
-                                </td>
-                   
-                                <td>
-                                <a class="btn bg-blue" href="{{ route('user.edit',['user'=>$user->id]) }}" >
+                                <a class="btn bg-blue" href="{{ route('attribute.edit',['attribute'=>$attribute->id]) }}" >
                                 <i class="fa fa-edit"></i> 
                                 </a>
                                 </td>
                                 <td>
-                                <form action="{{ Route('user.destroy',['user'=>$user->id]) }}" method="post">
+                                <form action="{{ Route('attribute.destroy',['attribute'=>$attribute->id]) }}" method="post">
                                     {{ csrf_field() }}
                                     {{ method_field('delete')}}
                                 <button type="submit" class="btn bg-red" >
@@ -130,7 +90,7 @@
                         </tbody>
                     </table>
                 </div>
-                {{ $users->links() }}
+                {{ $attributes->links() }}
             </div>
         </div>
     </div>

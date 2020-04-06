@@ -17,7 +17,7 @@
       @yield('content')
       
   </div>
-  @include('admin.layouts.footer')
+  {{-- @include('admin.layouts.footer') --}}
   @include('admin.layouts.sidebar')
 @include('admin.layouts.footer-script')
 </body>

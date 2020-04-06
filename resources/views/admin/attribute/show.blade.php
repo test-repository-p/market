@@ -4,11 +4,11 @@
 <section class="content-header">
     <h1>
         داشبرد
-        <small>  کاربران</small>
+        <small>    بویژگی ها</small>
     </h1>
     <ol class="breadcrumb">
         <li><a href="{{ Route('home') }}"><i class="fa fa-dashboard"></i> خانه</a></li>
-        <li><a href="{{ Route('user.index') }}"><i class="fa fa-dashboard"></i>  کاربران</a></li>
+        <li><a href="{{ Route('attribute.index') }}"><i class="fa fa-dashboard"></i>    ویژگی ها</a></li>
         <li class="active"> جزییات</li>
     </ol>
 </section>
@@ -24,32 +24,16 @@
     <div class="table-responsive">
       <table class="table">
         <tbody><tr>
-          <th style="width:50%">شماره کاربر  </th>
-          <td>{{ $user->id }}</td>
+          <th style="width:50%">شماره</th>
+          <td>{{ $attribute->id }}</td>
         </tr>
         <tr>
-          <th>نام  </th>
-          <td>{{ $user->name }}</td>
+          <th>نام</th>
+          <td>{{ $attribute->name }}</td>
         </tr>
         <tr>
-          <th>ایمیل</th>
-          <td>{{ $user->email }}</td>
-        </tr>
-        <tr>
-          <th>تصویر</th>
-          <td>
-            @if($user->photos()->first())
-            <img src="/{{ $user->photos()->first()->path }}" style="max-width:60px;max-height:60px;height: auto;float: right;">
-            @endif
-          </td>
-        </tr>
-        <tr>
-          <th>سطح دسترسی ها</th>
-          <td>
-            @foreach ($user->roles as $role)
-            ({{ $role->title }}),
-            @endforeach
-          </td>
+          <th>عنوان </th>
+          <td>{{ $attribute->title }}</td>
         </tr>
 
       </tbody>

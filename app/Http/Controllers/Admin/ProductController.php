@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Attribute;
+use App\Models\Attribute_Subcategory;
 use App\Models\Category;
 use App\Models\Photo;
 use App\Models\Product;
+use App\Models\Subcategory;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -31,8 +34,11 @@ class ProductController extends AdminController
     public function create()
     {
         $categorys = Category::get();
+        $subcategorys = Subcategory::get();
+        $attributes = Attribute::get();
+
         $tags = Tag::get();
-        return view('admin.product.create',compact('categorys','tags'));
+        return view('admin.product.create',compact('categorys','tags','attributes','subcategorys'));
     }
 
     /**
@@ -62,6 +68,8 @@ class ProductController extends AdminController
             'image' => 'required',
             'count' => 'required',
             'category_id' => 'required',
+            'id.*' => 'required',
+            'rate'=>'required',
         ]);
 
         $user_id = auth()->user()->id;
@@ -76,6 +84,24 @@ class ProductController extends AdminController
             'count' => $request['count'],
             'user_id' => $user_id,
         ]);
+        
+        $ides = $request->get('id');
+        
+        if(is_array($ides))
+        {
+            foreach($ides as $key => $value){
+                $att_sub = Attribute_Subcategory::find($value);
+                $att_sub->product_id = $product->id;
+                $att_sub->save();
+            }
+        }
+        // rating=====================
+        $rating = new \willvincent\Rateable\Rating;
+        $rating->rating = $request->rate;
+        $rating->user_id = auth()->user()->id;
+        $product->ratings()->save($rating);
+
+        
 
         // $tag = Tag::find($request->input('tag_id'));
         $product->tags()->sync($request->input('tag_id'));
@@ -83,7 +109,6 @@ class ProductController extends AdminController
         $file = $request['image'];
         $path = 'products/';
         $image = $this->ImageUploader($file,$path);
-
         $photo = new Photo;
         $photo->path = $image;
         $product->photos()->save($photo);
@@ -102,8 +127,10 @@ class ProductController extends AdminController
     public function show(Product $product)
     {
         $categorys = Category::get();
+        $attributes = Attribute::get();
+        $subcategorys = Subcategory::get();
         $tags = Tag::get();
-        return view('admin.product.show',compact('product','categorys','tags'));
+        return view('admin.product.show',compact('product','categorys','tags','attributes','subcategorys'));
     }
 
     /**
@@ -116,9 +143,10 @@ class ProductController extends AdminController
     {
         if(Gate::allows('view',$product))
         {
+            $attributes = Attribute::get();
             $categorys = Category::get();
             $tags = Tag::get();
-            return view('admin.product.edite',compact('product','categorys','tags'));
+            return view('admin.product.edite',compact('product','categorys','tags','attributes'));
         }
         else{
             session()->flash('msg',"شمااجازه دسترسی به این بخش راندارید");
@@ -143,7 +171,8 @@ class ProductController extends AdminController
             'discount' => 'required',
             // 'image' => 'required|image',
             'count' => 'required',
-            // 'category_id' => 'required',
+            'category_id' => 'required',
+            // 'id' =>'required'
         ]);
 
         if($request['image'])
@@ -162,6 +191,26 @@ class ProductController extends AdminController
         $photo->path = $image;
         $photo->save();
        
+        $ides = $request->get('id');
+        
+        if(is_array($ides))
+        {
+            foreach($ides as $key => $value){
+                $att_sub = Attribute_Subcategory::find($value);
+                $att_sub->product_id = $product->id;
+                $att_sub->save();
+            }
+        }
+
+        //=====rating====================================
+        // $product->ratingPercent($request['rating']);
+         // rating=====================
+         $rating = new \willvincent\Rateable\Rating;
+         $rating->rating = $request->rate;
+         $rating->user_id = auth()->user()->id;
+         $product->ratings()->save($rating);
+        
+
         // $tag = Tag::find($request->input('tag_id'));
         $product->tags()->sync($request->input('tag_id'));
 
@@ -180,11 +229,16 @@ class ProductController extends AdminController
      */
     public function destroy(Product $product)
     {
+        $id = $product->id;
+        $att_subs = Attribute_Subcategory::where('product_id',$id)->get();
+        foreach($att_subs as $key => $value){
+            $value->product_id = null;
+            $value->save();
+        }
+
         if($product->photos()->first())
         {
             $photo = $product->photos()->first();
-            // $photo->photoable_id = 0;
-            // $photo->photoable_type = "";
             unlink($product->photos()->first()->path) or die('Delete Error');
             $photo->delete();
         }

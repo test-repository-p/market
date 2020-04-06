@@ -29,7 +29,8 @@ class SubcategoryController extends AdminController
     public function create()
     {
         $categorys = Category::get();
-        return view('admin.subcategory.create',compact('categorys'));
+        $subcategorys = Subcategory::where('parent_id',0)->get();
+        return view('admin.subcategory.create',compact('categorys','subcategorys'));
     }
 
     /**
@@ -41,21 +42,37 @@ class SubcategoryController extends AdminController
     public function store(Request $request)
     {
         $this->validate(request(),[
-            'name' => 'required',
+            'name.*' => 'required',
+            'title.*' => 'required',
+            'type.*' => 'required',
             'category_id' => 'required',
-            // 'image' => 'image',
+            'parent_id' => 'required',
+            // 'body' => 'required'
+
         ]);
-       $subcategory = Subcategory::create([
-            'name' => $request['name'],
-            'category_id' => $request['category_id'],
-        ]);
-        $file = $request['image'];
-        $path = 'subcategorys/';
-        $image = $this->ImageUploader($file,$path);
         
-        $photo = new Photo;
-        $photo->path = $image;
-        $subcategory->photos()->save($photo);
+        $body = $request->get('body');
+        $category_id = $request->get('category_id');
+        $parent_id = $request->get('parent_id');
+        $names = $request->get('name');
+        $titles = $request->get('title');
+        $types = $request->get('type');
+        if(is_array($titles))
+        {
+            foreach($titles as $key => $value){
+                $name = array_key_exists($key,$names) ? $names[$key]:'-';
+                $type = array_key_exists($key,$types) ? $types[$key]:1;
+
+                $subcategory = Subcategory::create([
+                    'name' => $name,
+                    'title' => $value,
+                    'type' => $type,
+                    'category_id' => $category_id,
+                    'parent_id' => $parent_id,
+                    'body' => $body,
+                ]);
+            }
+        }
 
         session()->flash('msg','ذخیره  زیرگروه جدید انجام شد');
         return redirect(route('subcategory.index'));
@@ -82,7 +99,8 @@ class SubcategoryController extends AdminController
     public function edit(Subcategory $subcategory)
     {
         $categorys = Category::get();
-        return view('admin.subcategory.edite',compact('subcategory','categorys'));
+        $subcategorys = Subcategory::where('parent_id',0)->get();
+        return view('admin.subcategory.edite',compact('subcategory','categorys','subcategorys'));
     }
 
     /**
@@ -96,24 +114,13 @@ class SubcategoryController extends AdminController
     {
         $this->validate(request(),[
             'name' => 'required',
+            'title' => 'required',
             'category_id' => 'required',
-            // 'image' => 'image',
+            // 'parant_id' => 'required',
+            'type' => 'required',
+            // 'body' => 'required',
         ]);
-        if($request['image'])
-        {
-            unlink($subcategory->photos()->first()->path) or die('Delete Error');
-            $file = $request['image'];
-            $path = 'subcategorys/';
-            $image = $this->ImageUploader($file,$path);
-        }
-        else
-        {
-            $image = $subcategory->photos()->first()->path;
-        }
-
-        $photo = $subcategory->photos()->first();
-        $photo->path = $image;
-        $photo->save();
+       
 
         $data = $request->all();    
         $subcategory->update($data);
@@ -130,11 +137,6 @@ class SubcategoryController extends AdminController
      */
     public function destroy(Subcategory $subcategory)
     {
-        $photo = $subcategory->photos()->first();
-        $photo->photoable_id = 0;
-        $photo->photoable_type = "";
-        unlink($subcategory->photos()->first()->path) or die('Delete Error');
-        $photo->save();
         $subcategory->delete();
         session()->flash('msg','  زیرگروه موردنظر حذف شد');
         return redirect()->back();

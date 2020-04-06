@@ -43,9 +43,12 @@ class CategoryController extends AdminController
     {
         $this->validate(request(),[
             'name' => 'required',
+            'title' => 'required',
         ]);
         $category = Category::create([
             'name' => $request['name'],
+            'title' => $request['title'],
+
         ]);
 
         $category->tags()->sync($request->input('tag_id'));
@@ -89,6 +92,7 @@ class CategoryController extends AdminController
     {
         $this->validate(request(),[
             'name' => 'required',
+            'title' => 'required',
         ]);
 
         $category->tags()->sync($request->input('tag_id'));
