@@ -33,6 +33,7 @@ Route::group(['namespace'=>'Admin','middleware'=>['auth','UserLevel'],'prefix'=>
         Route::get('product/deletegallery/{id}','ProductController@delete_gallery');
         Route::post('product/upload','ProductController@upload');
 
+        
 
         Route::resource('panel','PanleController');
         Route::resource('product','ProductController');   
@@ -48,7 +49,14 @@ Route::group(['namespace'=>'Admin','middleware'=>['auth','UserLevel'],'prefix'=>
         Route::resource('information','InformationController');
         Route::resource('logo','LogoController');  
         Route::resource('article','ArticleController');  
-        Route::resource('comment','CommentController');  
+        Route::resource('comment','CommentController'); 
+
+        //==========crud ajax ==============
+        Route::resource('post','PostController');  
+
+        Route::post('post/action', 'PostController@action')->name('action');
+        
+
 
 
 
