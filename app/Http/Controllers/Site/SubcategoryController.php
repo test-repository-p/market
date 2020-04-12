@@ -57,14 +57,9 @@ class SubcategoryController extends Controller
         $subcategory = $subcat;
         $banner = Slider::where('name','like','%banner-1%')->get();
         $banner2 = Slider::where('name','like','banner-2')->get();
-        $categorys = Category::get();
-        $countsale = Product::orderBy('countsale','desc')->paginate(4);
-        $special = Product::where('special','1')->paginate(6);
-        $new = Product::orderBy('id','desc')->paginate(10);
         $product = Product::paginate(4);
         $filter = Attribute::get();
-        $info = Information::latest()->first();
-        $logo = Logo::first();
+     
 
         $att_sub1=null;
         $att_sub=[];
@@ -83,7 +78,7 @@ class SubcategoryController extends Controller
         }
       
      
-        return view('site.subcategory',compact('info','logo','categorys','product','countsale','special','new','banner','banner2','att_sub1','att_sub','filter','subcategory'));
+        return view('site.subcategory',compact('product','banner','banner2','att_sub1','att_sub','filter','subcategory'));
     
     }
 

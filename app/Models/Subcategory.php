@@ -15,7 +15,7 @@ class Subcategory extends Model
     }
     public function attributes()
     {
-        return $this->belongsToMany(Attribute::class)->withPivot('description','id');
+        return $this->belongsToMany(Attribute::class,'attribute_subcategories')->withPivot('description','id');
     }
     public function photos()
     {

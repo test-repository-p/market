@@ -22,21 +22,12 @@ class ContactController extends Controller
         $slider = Slider::where('name','like','%home%')->get();
         $banner = Slider::where('name','like','%banner-1%')->get();
         $banner2 = Slider::where('name','like','banner-2')->get();
-
-        $categorys = Category::get();
-        $countsale = Product::orderBy('countsale','desc')->paginate(6);
-        $special = Product::where('special','1')->paginate(6);
-        $new = Product::orderBy('id','desc')->paginate(6);
         
         $women = Product::where('category_id','1')->paginate(10);
         $men = Product::where('category_id','3')->paginate(10);
 
-        $info = Information::latest()->first();
-        $logo = Logo::first();
 
-
-
-        return view('site.contact-us',compact('info','logo','slider','categorys','countsale','special','new','banner','banner2','women','men'));
+        return view('site.contact-us',compact('slider','banner','banner2','women','men'));
     
 
     

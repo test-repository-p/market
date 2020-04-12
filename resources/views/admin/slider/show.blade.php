@@ -39,7 +39,7 @@
           <th>تصویر</th>
           <td>
             @if($slider->photos()->first())
-            <img src="/{{ $slider->photos()->first()->path }}" style="max-width:60px;max-height:60px;height: auto;float: right;">
+            <img src="/{{ $slider->photos()->first()->path }}" style="width:360px;height:260px;height: auto;float: right;">
             @endif
           </td>
         </tr>

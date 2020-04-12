@@ -3,9 +3,24 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Nicolaslopezj\Searchable\SearchableTrait;
+
 
 class Tag extends Model
 {
+    use SearchableTrait;
+    protected $searchable = [
+        /**
+         *
+         * @var array
+         */
+        'columns' => [
+            'tags.id' => 10,
+            'tags.name' => 10,
+
+        ],
+       
+    ];
     protected $fillable = [
         'name',
     ];

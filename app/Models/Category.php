@@ -3,9 +3,25 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Nicolaslopezj\Searchable\SearchableTrait;
+
 
 class Category extends Model
 {
+    use SearchableTrait;
+    protected $searchable = [
+        /**
+         *
+         * @var array
+         */
+        'columns' => [
+            'categories.name' => 6,
+            'categories.title' => 10,
+            'categories.id' => 2,
+
+        ],
+       
+    ];
     protected $fillable = [
         'name','chid','title',
     ];
@@ -26,19 +42,4 @@ class Category extends Model
         return $this->hasMany(Article::class);
     }
 
-    public static function search($data)
-    {
-        $category = Category::orderBy('id','DESC');
-        if(sizeof($data) > 0)
-        {
-            if(array_key_exists('name',$data))
-            {
-                $category = $category->where('name','like','%'.$data['name'].'%');
-            }
-        }
-
-        $category = $category->paginate(10);
-        return $category;
-    }
-    
 }

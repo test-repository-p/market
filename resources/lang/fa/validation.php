@@ -165,9 +165,11 @@ return [
         'text' => 'متن اصلی',
         'comment' => 'متن کامنت',
         'rate' => 'رتبه',
-        'tag' => '',
-        'tag' => '',
-        'tag' => '',
+        'status' => 'وضعیت',
+        'address' => 'آدرس',
+        'telephone' => 'تلفن',
+        'permission_id' => 'دسترسی',
+
 
 
     ],

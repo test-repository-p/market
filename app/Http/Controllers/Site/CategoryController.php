@@ -55,18 +55,13 @@ class CategoryController extends Controller
         $category = $cat;
         $banner = Slider::where('name','like','%banner-1%')->get();
         $banner2 = Slider::where('name','like','banner-2')->get();
-        $categorys = Category::get();
-        $countsale = Product::orderBy('countsale','desc')->paginate(4);
-        $special = Product::where('special','1')->paginate(6);
-        $new = Product::orderBy('id','desc')->paginate(10);
         $filter = Attribute::get();
-        $info = Information::latest()->first();
-        $logo = Logo::first();
+       
 
 
         $product = Product::paginate(5);
         
-        return view('site.category',compact('info','logo','categorys','countsale','special','new','banner','banner2','category','product','filter'));
+        return view('site.category',compact('banner','banner2','category','product','filter'));
     }
 
     /**

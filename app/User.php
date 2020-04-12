@@ -9,9 +9,24 @@ use App\Models\Role;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Nicolaslopezj\Searchable\SearchableTrait;
+
 
 class User extends Authenticatable
 {
+    use SearchableTrait;
+    protected $searchable = [
+        /**
+         *
+         * @var array
+         */
+        'columns' => [
+            'users.name' => 10,
+            'users.email' => 9,
+            'users.id' => 1,
+            ],
+    ];
+
     use Notifiable;
 
     /**
@@ -78,18 +93,5 @@ class User extends Authenticatable
         return false;
     }
     
-    public static function search($data)
-    {
-        $value = User::orderBy('id','DESC');
-        if(sizeof($data) > 0)
-        {
-            if(array_key_exists('name',$data))
-            {
-                $value = $value->where('name','like','%'.$data['name'].'%');
-            }
-        }
-
-        $value = $value->paginate(10);
-        return $value;
-    }
+   
 }

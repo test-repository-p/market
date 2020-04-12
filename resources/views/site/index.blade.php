@@ -147,7 +147,7 @@
     <!-- Banner End -->
 
  <!-- Brand محصولات Slider Start-->
- <h3 class="subtitle"> محصولات {{ $men->first()->category->title }} - <a class="viewall" href="{{ url('site/cat/'.$men->first()->category_id) }}">نمایش همه</a></h3>
+ {{-- <h3 class="subtitle"> محصولات {{ $men->first()->category->title }} - <a class="viewall" href="{{ url('site/cat/'.$men->first()->category_id) }}">نمایش همه</a></h3> --}}
  <div class="owl-carousel latest_brands_carousel">
     @foreach ($men as $item)    
     <div class="product-thumb">

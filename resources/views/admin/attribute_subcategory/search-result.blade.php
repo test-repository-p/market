@@ -45,14 +45,22 @@
                 <div class="box-header">
                     <h3 class="box-title">لیست  ویژگی ها</h3>
 
+                    {{-- search box --}}
+                    @if(request()->input('query'))
+                    <h3 class="subtitle"> نتایج جستجو</h3>
+                    <p>({{ $result->total() }} نتیجه برای {{ request()->input('query') }})</p>
+                    @endif
                     <div class="box-tools">
-                        <form class="input-group input-group-sm" style="width: 150px;">
-                            <input type="text" name="name" class="form-control pull-right" placeholder="جستجو">
+                        <form method="GET" action="{{ route('searchadmin') }}" class="input-group input-group-sm" style="width: 150px;">
+                            <input type="text" name="query" value="{{ request()->input('query') }}" class="form-control pull-right" placeholder="جستجو">
+                            <input type="text" hidden name="model" value="Attribute_Subcategory"> 
                             <div class="input-group-btn">
                                 <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
                             </div>
                         </form>
                     </div>
+                    {{-- //search box --}}
+
                 </div>
                 <!-- /.box-header -->
                 <div class="box-body table-responsive no-padding">
@@ -63,48 +71,50 @@
                                 <th>نام ویژگی  </th>
                                 <th>مقدارویژگی  </th>
                                 <th>نام سرگروه  </th>
-                                <th>ویرایش</th>
-                                <th>حذف</th>
+                                <td>عملیات</td>
+                                <td>عملیات</td>
+
                             </tr>
-                            @foreach($attributes as $attribute)
-                            @if($attribute->subcategories)
-                            @foreach ($attribute->subcategories as $val)
+                           
+                            
+                            @foreach($result as $val)
                             <tr>
-                                <td>{{ $val->pivot->id }}</td>
+                                <td>{{ $val->id }}</td>
                                 <td>
-                                    <a  href="{{ url('admin/attributevalue/'.$val->pivot->id) }}">
-                                    {{ $attribute->title }}</a>
+                                    <a  href="{{ url('admin/attributevalue/'.$val->id) }}">
+                                    <?php $attr = App\Models\Attribute::where('id',$val->attribute_id)->first(); ?> 
+                                    {{ $attr->title }}
+                                </a>
                                 </td>
-                                <td>{{ $val->pivot->description }}</td>
+                                <td>{{ $val->description }}</td>
                                 <td>
-                                  
-                                    {{ $val->title }}
+                                    <?php $sub = App\Models\Subcategory::where('id',$val->subcategory_id)->first(); ?>
+                                    {{ $sub->title }}
                                         
                                 </td>
                              
-                                <td>
-                                <a class="btn bg-blue" href="{{ url('admin/attributevalue/'.$val->pivot->id.'/edit') }}" >
+                            <td>
+                                <a class="btn btn-info mr-2" href="{{ url('admin/attributevalue/'.$val->id.'/edit') }}" >
                                 <i class="fa fa-edit"></i> 
                                 </a>
-                                </td>
-                                <td>
-                                <form action="{{ url('admin/attributevalue/'.$val->pivot->id) }}" method="post">
+                            </td>
+                            <td>
+                                <form action="{{ url('admin/attributevalue/'.$val->id) }}" method="post">
                                     {{ csrf_field() }}
                                     {{ method_field('delete')}}
                                 <button type="submit" class="btn bg-red" >
                                     <i class="fa fa-trash"></i> 
                                 </button>
                                 </form>   
-                                </td>
+                            </td>
                             </tr>
-                            @endforeach
-                            @endif
-
                             @endforeach
                         </tbody>
                     </table>
                 </div>
-                {{ $attributes->links() }}
+                {{ $result->appends(request()->input())->links() }}
+
+
             </div>
         </div>
     </div>

@@ -25,17 +25,10 @@ class IndexController extends Controller
         $slider = Slider::where('name','like','%home%')->get();
         $banner = Slider::where('name','like','%banner-1%')->get();
         $banner2 = Slider::where('name','like','banner-2')->get();
-
-        $categorys = Category::get();
-        $countsale = Product::orderBy('countsale','desc')->paginate(6);
-        $special = Product::where('special','1')->paginate(6);
-        $new = Product::orderBy('id','desc')->paginate(6);
         
         $women = Product::where('category_id','1')->paginate(10);
         $men = Product::where('category_id','3')->paginate(10);
-        $info = Information::latest()->first();
-        $logo = Logo::first();
-
+       
         $subs = Subcategory::where('category_id',1)->where('parent_id','=',0)->get();
         $submen = Subcategory::where('category_id',3)->where('parent_id','=',0)->get();
 
@@ -49,8 +42,33 @@ class IndexController extends Controller
 
 
 
-        return view('site.home',compact('submen','subs','info','logo','slider','categorys','countsale','special','new','banner','banner2','women','men'));
+        return view('site.home',compact('submen','subs','slider','banner','banner2','women','men'));
     }
+
+
+
+    public function search(Request $request)
+    {
+       
+        $query = $request->input('query');
+        // $result = Product::where('name','like',"%$query%")
+        // ->orWhere('price','like',"%$query%")
+        // ->paginate(5);
+        $result = Product::search($query)->paginate(5);
+        return view('site.search-result',compact('result'));
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -117,4 +135,5 @@ class IndexController extends Controller
     {
         //
     }
+
 }

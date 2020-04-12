@@ -3,9 +3,26 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Nicolaslopezj\Searchable\SearchableTrait;
+
 
 class Logo extends Model
 {
+    use SearchableTrait;
+    protected $searchable = [
+        /**
+         *
+         * @var array
+         */
+        'columns' => [
+            'logos.id' => 5,
+            'logos.name' => 10,
+            'logos.title' => 5,
+
+
+        ],
+       
+    ];
     protected $fillable = [
         'name','title',
     ];
@@ -13,18 +30,5 @@ class Logo extends Model
     {
         return $this->morphMany('App\Models\Photo',"photoable");
     }
-    public static function search($data)
-    {
-        $value = Logo::orderBy('id','DESC');
-        if(sizeof($data) > 0)
-        {
-            if(array_key_exists('name',$data))
-            {
-                $value = $value->where('name','like','%'.$data['name'].'%');
-            }
-        }
-
-        $value = $value->paginate(10);
-        return $value;
-    }
+   
 }

@@ -22,15 +22,9 @@ class CheckoutController extends Controller
         $slider = Slider::where('name','like','%home%')->get();
         $banner = Slider::where('name','like','%banner-1%')->get();
         $banner2 = Slider::where('name','like','banner-2')->get();
-        $categorys = Category::get();
-        $countsale = Product::orderBy('countsale','desc')->paginate(6);
-        $special = Product::where('special','1')->paginate(6);
-        $new = Product::orderBy('id','desc')->paginate(6);
+      
 
-        $info = Information::latest()->first();
-        $logo = Logo::first();
-
-        return view('site/checkout',compact('info','logo','slider','categorys','countsale','special','new','banner','banner2'));
+        return view('site/checkout',compact('slider','banner','banner2'));
 
     }
 

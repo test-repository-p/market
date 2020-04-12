@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Logo;
 use App\Models\Photo;
 use Illuminate\Http\Request;
+use Validator;
 
 class LogoController extends AdminController
 {
@@ -14,10 +15,10 @@ class LogoController extends AdminController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        $logos = Logo::search($request->all());
-        return view('admin.logo.index',compact('logos'));
+        $logos = Logo::orderBy('id','desc')->paginate(5);
+        return view('admin.logo.logo',compact('logos'));
     }
 
     /**
@@ -27,7 +28,7 @@ class LogoController extends AdminController
      */
     public function create()
     {
-        return view('admin.logo.create');
+        //
     }
 
     /**
@@ -38,114 +39,146 @@ class LogoController extends AdminController
      */
     public function store(Request $request)
     {
-        $this->validate(request(),[
+        $validator = Validator::make($request->all(), [
             'name' => 'required',
             'title' => 'required',
-            // 'image' => 'required',
-        ]);
-        $logo = Logo::create([
-            'name' => $request['name'],
-            'title' => $request['title'],
-        ]);
-        
-        $file = $request['image'];
-        $path = 'logos/';
-        $image = $this->ImageResize_logo($file,$path);
-        $photo = new Photo;
-        $photo->path = $image;
-        $logo->photos()->save($photo);
+            'image' =>  'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+		]);
+       
 
-        session()->flash('msg','ذخیره  لوگوجدید انجام شد');
-        return redirect(route('logo.index'));
+        if($validator->passes()){ 
+
+            $logo = Logo::updateOrCreate(
+                ['id' => $request->value_id],
+                ['name'=>$request->name,'title'=>$request->title]
+                ); 
+
+       
+
+            if($logo->photos()->first())
+                {
+                    $old_photo = $logo->photos()->first();
+                    unlink($old_photo->path) or die('Delete Error');
+                    $old_photo->delete();
+                }
+               
+                $file = $request->file('image');
+                $path = 'logos/';
+                $image = $this->ImageResize_logo($file,$path);
+                $photo = new Photo;
+                $photo->path = $image;
+                $l = $logo->photos()->save($photo);
+
+                $pic = ['path'=>$image];
+                
+                return response()->json(['success' => 'لوگو جدیدباموفقیت ذخیره شد.','logo'=>$logo,'pic'=>$pic]);
+
+
+            
+        }
+        return response(['errors'=>$validator->errors()->all()]);
+
+
+
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Logo  $logo
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function show(Logo $logo)
     {
         return view('admin.logo.show',compact('logo'));
+        
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Logo  $logo
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Logo $logo)
+    public function edit($id)
     {
-        return view('admin.logo.edite',compact('logo'));
+        if(request()->ajax())
+        {
+            $data = Logo::findOrFail($id);
+            $image = $data->photos()->first()->path;
+            $pic = ['path'=>$image];
+            return response()->json(['data' => $data,'pic'=>$pic]);
+        }
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Logo  $logo
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Logo $logo)
+    public function update(Request $request)
     {
-        $this->validate(request(),[
+        $validator = Validator::make($request->all(), [
             'name' => 'required',
             'title' => 'required',
-            // 'image' => 'required',
-        ]);
-        if($request['image'])
-        {
-            if($logo->photos()->first())
-            {
-                unlink($logo->photos()->first()->path) or die('Delete Error');
-                $file = $request['image'];
+            'image' =>  'image|mimes:jpeg,png,jpg,gif|max:2048',
+		]);
+       
+
+        if($validator->passes()){ 
+
+            $form_data = array(
+                'name'       =>   $request->name,
+                'title'        =>   $request->title,
+            );
+            $logo = Logo::find($request->hidden_id);
+            $u = $logo->update($form_data);
+
+       
+            $file = $request->file('image');
+            if($file != '')
+            {   
+                $old_photo = $logo->photos()->first();
+                unlink($old_photo->path);
                 $path = 'logos/';
                 $image = $this->ImageResize_logo($file,$path);
-            }
-            else
-            {
-                $file = $request['image'];
-                $path = 'logos/';
-                $image = $this->ImageResize_logo($file,$path);
-                $photo = new Photo;
-                $photo->path = $image;
-                $logo->photos()->save($photo);
-            }
-        }
-        else
-        {
-            $image = $logo->photos()->first()->path;
-        }
-        $photo = $logo->photos()->first();
-        $photo->path = $image;
-        $photo->save();
+                $old_photo->path = $image;
+                $old_photo->save();    
+                $pic = ['path'=>$image];            
+             }
+             $old = $logo->photos()->first()->path;
+             $pic = ['path'=>$old];
+               
+            return response()->json(['success' => 'لوگوی موردنظرباموفقیت ویرایش شد.','logo'=>$logo,'pic'=>$pic]);
 
-        $data = $request->all();    
-        $logo->update($data);
+        }
+        return response(['errors'=>$validator->errors()->all()]);
 
-        session()->flash('msg','تغییرات  لوگو انجام شد');
-        return redirect(route('logo.index'));
+
+
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Logo  $logo
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Logo $logo)
+    public function destroy($id)
     {
-        if($logo->photos()->first())
+        $l = Logo::find($id);
+        if($l->photos()->first())
         {
-            $photo = $logo->photos()->first();
-            unlink($logo->photos()->first()->path) or die('Delete Error');
+            $photo = $l->photos()->first();
+            unlink($l->photos()->first()->path) or die('Delete Error');
             $photo->delete();
+            
         }
-       
-        $logo->delete();
-        session()->flash('msg','  لوگو موردنظر حذف شد');
-        return redirect()->back();
+
+        $logo = Logo::where('id',$id)->delete();
+        return response()->json($logo);
+
     }
 }

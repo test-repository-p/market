@@ -3,7 +3,12 @@
 namespace App\Providers;
 
 use App\Models\Basket;
+use App\Models\Category;
+use App\Models\Information;
+use App\Models\Logo;
+use App\Models\Product;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -26,6 +31,22 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Schema::defaultStringLength(191);
+
+        $categorys = Category::get();
+        $countsale = Product::orderBy('countsale','desc')->paginate(6);
+        $special = Product::where('special','1')->paginate(6);
+        $new = Product::orderBy('id','desc')->paginate(6);
+        $info = Information::where('state','1')->first();
+        $logo = Logo::first();
+        View::share([
+            'categorys'    => $categorys,
+            'countsale'   => $countsale,
+            'special' => $special,
+            'new'  => $new,
+            'info'  => $info,
+            'logo'  => $logo
+        ]);
+
         view()->composer('site.layouts.header',function($view){
             $auth = auth()->user();
             if($auth != null){

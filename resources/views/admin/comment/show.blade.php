@@ -34,9 +34,15 @@
         <tr>
           <th> محصول/مقاله</th>
           <td>
+            @if($comment->products)
+            {{ "محصول: " }}
+            @endif
             @foreach($comment->products as $item) 
             {{ $item->name }},
             @endforeach
+            @if($comment->articles)
+            {{ "مقاله: " }}
+            @endif
             @foreach($comment->articles as $item) 
             {{ $item->title }},
             @endforeach
@@ -48,7 +54,7 @@
         </tr> 
         <tr>
           <th>تاریخ ارسال</th>
-          <td>{{ Verta::instance($comment->created_at)->format('Y/n/j') }}}</td>
+          <td>{{ Verta::instance($comment->created_at)->format('Y/n/j') }}</td>
         </tr> 
       
       </tbody>

@@ -73,7 +73,7 @@
 </section>
 
 @endsection
-@section('script')
+@section('script-footer')
 <script>
   function addSub(){
     var count = document.getElementsByClassName('sub_div').length+1;

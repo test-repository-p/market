@@ -4,7 +4,7 @@
 <section class="content-header">
     <ol class="breadcrumb">
         <li><a href="{{ Route('home') }}"><i class="fa fa-dashboard"></i> خانه</a></li>
-        <li class="active">  ویژگی ها</li>
+        <li class="active">  زیرگروه دسته بندیها</li>
     </ol>
 </section>
 @endsection
@@ -34,7 +34,7 @@
       @endif
     
     <div class="col-md-9">
-    <a class="btn btn-app bg-green" href="{{ Route('attribute.create') }}">
+    <a class="btn btn-app bg-green" href="{{ Route('attributevalue.create') }}">
         <i class="fa fa-save "></i> افزودن
     </a>
     </div>
@@ -45,14 +45,22 @@
                 <div class="box-header">
                     <h3 class="box-title">لیست  ویژگی ها</h3>
 
+                    {{-- search box --}}
+                    @if(request()->input('query'))
+                    <h3 class="subtitle"> نتایج جستجو</h3>
+                    <p>({{ $result->total() }} نتیجه برای {{ request()->input('query') }})</p>
+                    @endif
                     <div class="box-tools">
-                        <form class="input-group input-group-sm" style="width: 150px;">
-                            <input type="text" name="name" class="form-control pull-right" placeholder="جستجو">
+                        <form method="GET" action="{{ route('searchadmin') }}" class="input-group input-group-sm" style="width: 150px;">
+                            <input type="text" name="query" value="{{ request()->input('query') }}" class="form-control pull-right" placeholder="جستجو">
+                            <input type="text" hidden name="model" value="Attribute_Subcategory"> 
                             <div class="input-group-btn">
                                 <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
                             </div>
                         </form>
                     </div>
+                    {{-- //search box --}}
+
                 </div>
                 <!-- /.box-header -->
                 <div class="box-body table-responsive no-padding">
@@ -60,40 +68,56 @@
                         <tbody>
                             <tr>
                                 <th>ردیف</th>
-                                <th>نام  </th>
-                                <th>عنوان  </th>
-                                <th>ویرایش</th>
-                                <th>حذف</th>
+                                <th>نام ویژگی  </th>
+                                <th>مقدارویژگی  </th>
+                                <th>نام سرگروه  </th>
+                                <td>عملیات</td>
+                                <td>عملیات</td>
+
                             </tr>
                             @foreach($attributes as $attribute)
+                            @if($attribute->subcategories)
+                            @foreach ($attribute->subcategories as $val)
                             <tr>
-                                <td>{{ $attribute->id }}</td>
-                                <td><a  href="{{ route('attribute.show',['attribute'=>$attribute->id]) }}">{{ $attribute->name }}</a>
-                                </td>
-                                <td>{{ $attribute->title }}</td>
+                                <td>{{ $val->pivot->id }}</td>
                                 <td>
-                                <a class="btn bg-blue" href="{{ route('attribute.edit',['attribute'=>$attribute->id]) }}" >
+                                    <a  href="{{ url('admin/attributevalue/'.$val->pivot->id) }}">
+                                    {{ $attribute->title }}</a>
+                                </td>
+                                <td>{{ $val->pivot->description }}</td>
+                                <td>
+                                  
+                                    {{ $val->title }}
+                                        
+                                </td>
+                             
+                            <td>
+                                <a class="btn btn-info mr-2" href="{{ url('admin/attributevalue/'.$val->pivot->id.'/edit') }}" >
                                 <i class="fa fa-edit"></i> 
                                 </a>
-                                </td>
-                                <td>
-                                <form action="{{ Route('attribute.destroy',['attribute'=>$attribute->id]) }}" method="post">
+                            </td>
+                            <td>
+                                <form action="{{ url('admin/attributevalue/'.$val->pivot->id) }}" method="post">
                                     {{ csrf_field() }}
                                     {{ method_field('delete')}}
                                 <button type="submit" class="btn bg-red" >
                                     <i class="fa fa-trash"></i> 
                                 </button>
                                 </form>   
-                                </td>
+                            </td>
                             </tr>
                             @endforeach
+                            @endif
+                           @endforeach
                         </tbody>
                     </table>
                 </div>
                 {{ $attributes->links() }}
+
             </div>
         </div>
     </div>
     
 </section>
+
 @endsection

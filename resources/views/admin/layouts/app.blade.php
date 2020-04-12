@@ -5,7 +5,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   @yield('title')
   @include('admin.layouts.head')
-  @yield('script')
+  @yield('script-head')
+
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
 <div class="wrapper">
@@ -19,6 +20,8 @@
   </div>
   {{-- @include('admin.layouts.footer') --}}
   @include('admin.layouts.sidebar')
+  @yield('modol')
+  @yield('script-footer')
 @include('admin.layouts.footer-script')
 </body>
 </html>

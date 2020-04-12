@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tag;
+use App\Models\Taggable;
 use Illuminate\Http\Request;
+use Validator,Redirect,Response;
 
-class TagController extends Controller
+
+class TagController extends AdminController
 {
     /**
      * Display a listing of the resource.
@@ -15,8 +18,9 @@ class TagController extends Controller
      */
     public function index()
     {
-        $tags = Tag::paginate(10);
-        return view('admin.tag.index',compact('tags'));
+        
+        $tags = Tag::orderBy('id','desc')->paginate(5);
+        return view('admin.tag.tag',compact('tags'));
     }
 
     /**
@@ -26,7 +30,7 @@ class TagController extends Controller
      */
     public function create()
     {
-        return view('admin.tag.create');
+        //
     }
 
     /**
@@ -37,15 +41,21 @@ class TagController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate(request(),[
-            'name' => 'required',
-        ]);
-        $tag = tag::create([
-            'name' => $request['name'],
-        ]);
+        
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string',
+		]);
 
-        session()->flash('msg','ذخیره  کلمه کلیدی جدید انجام شد');
-        return redirect(route('tag.index'));
+        $arr = array('msg' => 'خطا!', 'status' => false);       
+        if($validator->passes()){ 
+            $tag = Tag::updateOrCreate(['id' => $request->value_id],
+            ['name' => $request->name]
+        );     
+        $arr = array('msg' => 'باموفقیت انجام شد!', 'status' => true);
+        return response(["tag"=>$tag,"arr"=>$arr]);
+
+        }
+        return response(["arr"=>$arr,'errors'=>$validator->errors()->all()]);
     }
 
     /**
@@ -65,9 +75,11 @@ class TagController extends Controller
      * @param  \App\Models\Tag  $tag
      * @return \Illuminate\Http\Response
      */
-    public function edit(Tag $tag)
+    public function edit($id)
     {
-        return view('admin.tag.edite',compact('tag'));
+        $where = array('id' => $id);
+        $tag  = Tag::where($where)->first();
+        return response()->json($tag);
     }
 
     /**
@@ -79,15 +91,7 @@ class TagController extends Controller
      */
     public function update(Request $request, Tag $tag)
     {
-        $this->validate(request(),[
-            'name' => 'required',
-        ]);
-
-        $data = $request->all();    
-        $tag->update($data);
-
-        session()->flash('msg','تغییرات  کلمه کلیدی موردنظر انجام شد');
-        return redirect(route('tag.index'));
+        // 
     }
 
     /**
@@ -96,10 +100,14 @@ class TagController extends Controller
      * @param  \App\Models\Tag  $tag
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Tag $tag)
+    public function destroy($id)
     {
-        $tag->delete();
-        session()->flash('msg','  کلمه کلیدی موردنظر حذف شد');
-        return redirect()->back();
+        $a = Taggable::where('tag_id',$id)->get();
+        foreach($a as $val){
+            $val->delete();       
+        }
+
+        $tag = Tag::where('id',$id)->delete();
+        return response()->json($tag);
     }
 }

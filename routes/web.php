@@ -33,37 +33,62 @@ Route::group(['namespace'=>'Admin','middleware'=>['auth','UserLevel'],'prefix'=>
         Route::get('product/deletegallery/{id}','ProductController@delete_gallery');
         Route::post('product/upload','ProductController@upload');
 
-        
-
-        Route::resource('panel','PanleController');
         Route::resource('product','ProductController');   
+        Route::resource('subcategory','SubcategoryController');   
+        Route::resource('attributevalue','AttributevalueController');   
+
+        Route::resource('article','ArticleController');  
+        Route::resource('panel','PanleController');
+
+
+
+        //==========crud ajax ========================
+        Route::resource('post','PostController');  
+        Route::resource('attribute','AttributeController');   
         Route::resource('role','RoleController');   
-        Route::resource('user','UserController');   
         Route::resource('permission','PermissionController');   
         Route::resource('category','CategoryController');   
-        Route::resource('subcategory','SubcategoryController');   
-        Route::resource('attribute','AttributeController');   
-        Route::resource('attributevalue','AttributevalueController');   
-        Route::resource('tag','TagController');  
-        Route::resource('slider','SliderController');  
         Route::resource('information','InformationController');
-        Route::resource('logo','LogoController');  
-        Route::resource('article','ArticleController');  
+        Route::resource('tag','TagController');  
         Route::resource('comment','CommentController'); 
 
-        //==========crud ajax ==============
-        Route::resource('post','PostController');  
+        Route::resource('logo','LogoController');  
+        Route::post('logo/update', 'LogoController@update')->name('logo.update');
+        Route::get('logo/destroy/{id}', 'LogoController@destroy');
 
+        Route::resource('user','UserController');
+        Route::post('user/update', 'UserController@update')->name('user.update');
+        Route::get('user/destroy/{id}', 'UserController@destroy');
+        
+        Route::resource('slider','SliderController');
+        Route::post('slider/update', 'SliderController@update')->name('slider.update');
+        Route::get('slider/destroy/{id}', 'SliderController@destroy');  
+        
+
+
+        //==========search route ===============
+        Route::get('searchadmin','AdminController@search')->name('searchadmin');  
+
+
+        //======test controller =================
         Route::post('post/action', 'PostController@action')->name('action');
         
 
 
-
-
-
-
     });
     
+
+
+
+
+
+
+
+
+
+
+
+
 
     Route::group(['namespace'=>'User','middleware'=>['auth','UserLevel'],'prefix'=>'user'],function(){
     
@@ -94,12 +119,9 @@ Route::group(['namespace'=>'Admin','middleware'=>['auth','UserLevel'],'prefix'=>
     Route::resource('site/checkout','CheckoutController');  
 
 
+//=================search route ========================
 
-
-    
-
-
-
+    Route::get('/search','IndexController@search')->name('search');
 
 
     //==============ajax route =========================

@@ -17,6 +17,8 @@
         "laravel/socialite": "^4.3",
         "laravel/tinker": "^2.0",
         "laravelcollective/html": "^6.1",
+        "morilog/jalali": "3.*",
+        "nicolaslopezj/searchable": "^1.13",
         "willvincent/laravel-rateable": "^2.0",
         "yajra/laravel-datatables-oracle": "^9.9"
     },

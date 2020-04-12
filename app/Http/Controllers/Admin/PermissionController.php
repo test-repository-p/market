@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use Illuminate\Http\Request;
+use Validator,Redirect,Response;
+
 
 class PermissionController extends AdminController
 {
@@ -13,10 +15,10 @@ class PermissionController extends AdminController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        $permissions = Permission::search($request->all());
-        return view('admin.permission.index',compact('permissions'));
+        $permissions = Permission::orderBy('id','desc')->paginate(5);
+        return view('admin.permission.permission',compact('permissions'));
     }
 
     /**
@@ -37,17 +39,23 @@ class PermissionController extends AdminController
      */
     public function store(Request $request)
     {
-        $this->validate(request(),[
-            'name' => 'required',
-            'title' => 'required',
-        ]);
-        Permission::create([
-            'name' => $request['name'],
-            'title' => $request['title'],
-        ]);
 
-        session()->flash('msg','ذخیره  دسترسی جدید انجام شد');
-        return redirect(route('permission.index'));
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'title' => 'required|string',
+		]);
+      
+        $arr = array('msg' => 'خطا!', 'status' => false);      
+        if($validator->passes()){ 
+
+            $information = Permission::updateOrCreate(
+            ['id' => $request->value_id],
+            ['name'=>$request->name,'title'=>$request->title]
+        );     
+        $arr = array('msg' => 'باموفقیت انجام شد!', 'status' => true);
+        return response(["information"=>$information,"arr"=>$arr]);
+        }
+        return response(["arr"=>$arr,'errors'=>$validator->errors()->all()]);
     }
 
     /**
@@ -67,9 +75,11 @@ class PermissionController extends AdminController
      * @param  \App\Models\Permission  $permission
      * @return \Illuminate\Http\Response
      */
-    public function edit(Permission $permission)
+    public function edit($id)
     {
-        return view('admin.permission.edite',compact('permission'));
+        $where = array('id' => $id);
+        $information  = Permission::where($where)->first();
+        return response()->json($information);
     }
 
     /**
@@ -81,15 +91,7 @@ class PermissionController extends AdminController
      */
     public function update(Request $request, Permission $permission)
     {
-        $this->validate(request(),[
-            'name' => 'required',
-            'title' => 'required',
-        ]);
-        $data = $request->all();    
-        $permission->update($data);
-
-        session()->flash('msg','تغییرات  دسترسی انجام شد');
-        return redirect(route('permission.index'));
+       //
     }
 
     /**
@@ -98,10 +100,9 @@ class PermissionController extends AdminController
      * @param  \App\Models\Permission  $permission
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Permission $permission)
+    public function destroy($id)
     {
-        $permission->delete();
-        session()->flash('msg',' دسترسی حذف شد');
-        return redirect()->back();
+        $information = Permission::where('id',$id)->delete();
+        return response()->json($information);
     }
 }

@@ -19,8 +19,8 @@ class AttributevalueController extends AdminController
      */
     public function index()
     {
-        $attributes = Attribute::paginate(10);
-        return view('admin.attributevalue.index',compact('attributes'));
+        $attributes = Attribute::paginate(1);
+        return view('admin.attribute_subcategory.index',compact('attributes'));
     }
 
     /**
@@ -32,7 +32,7 @@ class AttributevalueController extends AdminController
     {
         $attributes = Attribute::get();
         $subcategorys = Subcategory::get();
-        return view('admin.attributevalue.create',compact('attributes','subcategorys'));
+        return view('admin.attribute_subcategory.create',compact('attributes','subcategorys'));
     }
 
     /**
@@ -61,7 +61,7 @@ class AttributevalueController extends AdminController
             }
         }
         session()->flash('msg','ذخیره  مقدارویژگی جدید انجام شد');
-        return redirect(route('attributevalue.index'));
+        return redirect(route('attribute_subcategory.index'));
 
     }
 
@@ -76,7 +76,7 @@ class AttributevalueController extends AdminController
         $att_sub = Attribute_Subcategory::find($id);
         $attributes = Attribute::get();
         $subcategorys = Subcategory::get();
-        return view('admin.attributevalue.show',compact('attributes','att_sub','subcategorys'));
+        return view('admin.attribute_subcategory.show',compact('attributes','att_sub','subcategorys'));
     }
 
     /**
@@ -89,7 +89,7 @@ class AttributevalueController extends AdminController
         $att_sub = Attribute_Subcategory::find($id);
         $attributes = Attribute::get();
         $subcategorys = Subcategory::get();
-        return view('admin.attributevalue.edite',compact('attributes','subcategorys','att_sub'));
+        return view('admin.attribute_subcategory.edite',compact('attributes','subcategorys','att_sub'));
     }
 
     /**
@@ -109,7 +109,7 @@ class AttributevalueController extends AdminController
         $att_sub->update($data);
 
         session()->flash('msg','تغییرات  ویژگی موردنظر انجام شد');
-        return redirect(route('attributevalue.index'));
+        return redirect(route('attribute_subcategory.index'));
     }
 
     /**

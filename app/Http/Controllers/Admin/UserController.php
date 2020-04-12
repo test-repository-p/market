@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Photo;
 use App\Models\Role;
 use App\User;
+use Validator;
 use Illuminate\Http\Request;
 
 class UserController extends AdminController
@@ -17,8 +18,9 @@ class UserController extends AdminController
      */
     public function index(Request $request)
     {
-        $users = User::search($request->all());
-        return view('admin.user.index',compact('users'));
+        $users = User::orderBy('id','desc')->paginate(5);
+        $roles = Role::get();
+        return view('admin.user.user',compact('users','roles'));
     }
 
     /**
@@ -40,28 +42,43 @@ class UserController extends AdminController
      */
     public function store(Request $request)
     {
-        $this->validate(request(),[
-            'name' => 'required',
-            'email' => 'required',
-            'password' => 'required',
-            // 'image' => 'required',
-        ]);
-        $user = User::create([
-            'name' => $request['name'],
-            'email' => $request['email'],
-            'password' => bcrypt($request['password']),
-        ]);
-        $user->roles()->sync($request->input('role_id'));
         
-        $file = $request['image'];
-        $path = 'users/';
-        $image = $this->ImageUploader($file,$path);
-        $photo = new Photo;
-        $photo->path = $image;
-        $user->photos()->save($photo);
+        // $validator = Validator::make($request->all(), [
+        //     'name' => 'required',
+        //     'email' => 'required',
+        //     'password' => 'required',
+        //     'role_id' =>'required',
+        //     'image' =>  'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+		// ]);
+       
 
-        session()->flash('msg','ذخیره  کاربرجدید انجام شد');
-        return redirect(route('user.index'));
+        // if($validator->passes()){ 
+
+        //     $pass = bcrypt($request->password);
+        //     $user = User::updateOrCreate(
+        //         ['id' => $request->value_id],
+        //         ['name'=>$request->name,'email'=>$request->title,'password'=>$pass]
+        //         ); 
+
+        //     // 'password' => bcrypt($request['password']),
+
+        //     $u = $user->roles()->sync($request->input('role_id'));
+            
+        //     $file = $request->file('image');
+        //     $path = 'users/';
+        //     $image = $this->ImageResize_user($file,$path);
+        //     $photo = new Photo;
+        //     $photo->path = $image;
+        //     $l = $user->photos()->save($photo);
+
+        //     $pic = ['path'=>$image];
+            
+        //     return response()->json(['success' => 'کاربر جدیدباموفقیت ذخیره شد.','user'=>$user,'pic'=>$pic]);
+
+
+            
+        // }
+        // return response(['errors'=>$validator->errors()->all()]);
     }
 
     /**
@@ -82,10 +99,15 @@ class UserController extends AdminController
      * @param  \App\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function edit(User $user)
+    public function edit($id)
     {
-        $roles = Role::get();
-        return view('admin.user.edite',compact('user','roles'));
+        if(request()->ajax())
+        {
+            $data = User::findOrFail($id);
+            $image = $data->photos()->first()->path;
+            $pic = ['path'=>$image];
+            return response()->json(['data' => $data,'pic'=>$pic]);
+        }
     }
 
     /**
@@ -97,44 +119,85 @@ class UserController extends AdminController
      */
     public function update(Request $request, User $user)
     {
-        $this->validate(request(),[
-            'name' => 'required',
-            'email' => 'required',
-            // 'image' => 'required',
-        ]);
-        if($request['image'])
-        {
-            if($user->photos()->first())
-            {
-                unlink($user->photos()->first()->path) or die('Delete Error');
-                $file = $request['image'];
-                $path = 'users/';
-                $image = $this->ImageUploader($file,$path);
-            }
-            else
-            {
-                $file = $request['image'];
-                $path = 'users/';
-                $image = $this->ImageUploader($file,$path);
-                $photo = new Photo;
-                $photo->path = $image;
-                $user->photos()->save($photo);
-            }
-        }
-        else
-        {
-            $image = $user->photos()->first()->path;
-        }
-        $photo = $user->photos()->first();
-        $photo->path = $image;
-        $photo->save();
+        // $this->validate(request(),[
+        //     'name' => 'required',
+        //     'email' => 'required',
+        //     // 'image' => 'required',
+        // ]);
+        // if($request['image'])
+        // {
+        //     if($user->photos()->first())
+        //     {
+        //         unlink($user->photos()->first()->path) or die('Delete Error');
+        //         $file = $request['image'];
+        //         $path = 'users/';
+        //         $image = $this->ImageUploader($file,$path);
+        //     }
+        //     else
+        //     {
+        //         $file = $request['image'];
+        //         $path = 'users/';
+        //         $image = $this->ImageUploader($file,$path);
+        //         $photo = new Photo;
+        //         $photo->path = $image;
+        //         $user->photos()->save($photo);
+        //     }
+        // }
+        // else
+        // {
+        //     $image = $user->photos()->first()->path;
+        // }
+        // $photo = $user->photos()->first();
+        // $photo->path = $image;
+        // $photo->save();
 
-        $data = $request->all();    
-        $user->update($data);
-        $user->roles()->sync($request->input('role_id'));
+        // $data = $request->all();    
+        // $user->update($data);
+        // $user->roles()->sync($request->input('role_id'));
 
-        session()->flash('msg','تغییرات  کاربر انجام شد');
-        return redirect(route('user.index'));
+        // session()->flash('msg','تغییرات  کاربر انجام شد');
+        // return redirect(route('user.index'));
+
+
+        $validator = Validator::make($request->all(), [
+            // 'name' => 'required',
+            // 'email' => 'required',
+            // 'password' => 'required',
+            'role_id' =>'required',
+            'image' =>  'image|mimes:jpeg,png,jpg,gif|max:2048',
+		]);
+       
+
+        if($validator->passes()){ 
+
+//             $form_data = array(
+//                 'name'       =>   $request->name,
+//                 'email'        =>   $request->email,
+// x            );
+            $user = User::find($request->hidden_id);
+            // $u = $user->update($form_data);
+            $u2 = $user->roles()->sync($request->input('role_id'));
+
+       
+            $file = $request->file('image');
+            if($file != '')
+            {   
+                $old_photo = $user->photos()->first();
+                unlink($old_photo->path);
+                $path = 'users/';
+                $image = $this->ImageResize_user($file,$path);
+                $old_photo->path = $image;
+                $old_photo->save();    
+                $pic = ['path'=>$image];            
+             }
+             $old = $user->photos()->first()->path;
+             $pic = ['path'=>$old];
+               
+            return response()->json(['success' => 'کاربر موردنظرباموفقیت ویرایش شد.','user'=>$user,'pic'=>$pic]);
+
+        }
+        return response(['errors'=>$validator->errors()->all()]);
+
     }
 
     /**
@@ -143,23 +206,24 @@ class UserController extends AdminController
      * @param  \App\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $user)
+    public function destroy($id)
     {
         // $photo = $user->photos()->first();
         // $photo->photoable_id = 0;
         // $photo->photoable_type = "";
         // unlink($user->photos()->first()->path) or die('Delete Error');
         // $photo->save();
-
-        if($user->photos()->first())
+        
+        $l = User::find($id);
+        if($l->photos()->first())
         {
-            $photo = $user->photos()->first();
-            unlink($user->photos()->first()->path) or die('Delete Error');
+            $photo = $l->photos()->first();
+            unlink($l->photos()->first()->path) or die('Delete Error');
             $photo->delete();
+            
         }
-       
-        $user->delete();
-        session()->flash('msg','  کاربر موردنظر حذف شد');
-        return redirect()->back();
+
+        $user = User::where('id',$id)->delete();
+        return response()->json($user);
     }
 }

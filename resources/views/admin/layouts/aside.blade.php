@@ -171,8 +171,8 @@
       </span>
     </a>
     <ul class="treeview-menu">
-      <li><a href="{{ Route('comment.index') }}"><i class="fa fa-circle-o text-aqua"></i>لیست کامنت ها  </a></li>
-  <li><a href="{{ Route('comment.create') }}"><i class="fa fa-circle-o text-aqua"></i>افزودن  کامنت جدید </a></li>
+      <li><a href="{{ Route('comment.index') }}"><i class="fa fa-circle-o text-aqua"></i> کامنت های محصولات  </a></li>
+  <li><a href=""><i class="fa fa-circle-o text-aqua"></i>  کامنت های مقاله ها </a></li>
     </ul>
   </li>
  {{-- @endcan --}}

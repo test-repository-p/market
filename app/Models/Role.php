@@ -4,9 +4,26 @@ namespace App\Models;
 
 use App\User;
 use Illuminate\Database\Eloquent\Model;
+use Nicolaslopezj\Searchable\SearchableTrait;
 
 class Role extends Model
 {
+    use SearchableTrait;
+    protected $searchable = [
+        /**
+         *
+         * @var array
+         */
+        'columns' => [
+            'roles.id' => 4,
+            'roles.name' => 6,
+            'roles.title' => 8,
+          
+
+        ],
+       
+       
+    ];
     protected $fillable = [
         'name','title',
     ];
@@ -18,19 +35,5 @@ class Role extends Model
     {
         return $this->belongsToMany(Permission::class);
     }
-    public static function search($data)
-    {
-        $value = Role::orderBy('id','DESC');
-        if(sizeof($data) > 0)
-        {
-            if(array_key_exists('name',$data) && array_key_exists('title',$data))
-            {
-                $value = $value->where('name','like','%'.$data['name'].'%')
-                ->where('title','like','%'.$data['title'].'%');
-            }
-        }
-
-        $value = $value->paginate(10);
-        return $value;
-    }
+    
 }

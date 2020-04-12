@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Photo;
 use App\Models\Slider;
 use Illuminate\Http\Request;
+use Validator;
+
 
 class SliderController extends AdminController
 {
@@ -14,10 +16,10 @@ class SliderController extends AdminController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        $sliders = Slider::search($request->all());
-        return view('admin.slider.index',compact('sliders'));
+        $sliders = Slider::orderBy('id','desc')->paginate(5);
+        return view('admin.slider.slider',compact('sliders'));
     }
 
     /**
@@ -27,7 +29,7 @@ class SliderController extends AdminController
      */
     public function create()
     {
-        return view('admin.slider.create');
+        // return view('admin.slider.create');
     }
 
     /**
@@ -38,31 +40,64 @@ class SliderController extends AdminController
      */
     public function store(Request $request)
     {
-        // var_dump($request['job']);die;
-        $this->validate(request(),[
+       
+        // $slider = Slider::create([
+        //     'name' => $request['name'],
+        //     'url' => $request['url'],
+        //     'text' => $request['text'],
+        // ]);
+        
+        // $file = $request['image'];
+        // $path = 'sliders/';
+        // $image = $this->ImageResize($file,$path);
+        // $photo = new Photo;
+        // $photo->path = $image;
+        // $slider->photos()->save($photo);
+
+        // session()->flash('msg','ذخیره اسلایدرجدید انجام شد');
+        // return redirect(route('slider.index'));
+
+
+        $validator = Validator::make($request->all(), [
             'name' => 'required',
             'url' => 'required',
             'image' => 'required',
             // 'text' =>'required',
-        ]);
+            'image' =>  'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+		]);
+       
+
+        if($validator->passes()){ 
+
+            $slider = Slider::updateOrCreate(
+                ['id' => $request->value_id],
+                ['name'=>$request->name,'url'=>$request->url,'text'=>$request->text]
+                ); 
+
+       
+
+            if($slider->photos()->first())
+                {
+                    $old_photo = $slider->photos()->first();
+                    unlink($old_photo->path) or die('Delete Error');
+                    $old_photo->delete();
+                }
+               
+                $file = $request->file('image');
+                $path = 'sliders/';
+                $image = $this->ImageResize($file,$path);
+                $photo = new Photo;
+                $photo->path = $image;
+                $l = $slider->photos()->save($photo);
+
+                $pic = ['path'=>$image];
+                
+                return response()->json(['success' => 'اسلایدر جدیدباموفقیت ذخیره شد.','slider'=>$slider,'pic'=>$pic]);
 
 
-
-        $slider = Slider::create([
-            'name' => $request['name'],
-            'url' => $request['url'],
-            'text' => $request['text'],
-        ]);
-        
-        $file = $request['image'];
-        $path = 'sliders/';
-        $image = $this->ImageResize($file,$path);
-        $photo = new Photo;
-        $photo->path = $image;
-        $slider->photos()->save($photo);
-
-        session()->flash('msg','ذخیره اسلایدرجدید انجام شد');
-        return redirect(route('slider.index'));
+            
+        }
+        return response(['errors'=>$validator->errors()->all()]);
     }
 
     /**
@@ -82,9 +117,15 @@ class SliderController extends AdminController
      * @param  \App\Models\Slider  $slider
      * @return \Illuminate\Http\Response
      */
-    public function edit(Slider $slider)
+    public function edit($id)
     {
-        return view('admin.slider.edite',compact('slider'));
+        if(request()->ajax())
+        {
+            $data = Slider::findOrFail($id);
+            $image = $data->photos()->first()->path;
+            $pic = ['path'=>$image];
+            return response()->json(['data' => $data,'pic'=>$pic]);
+        }
     }
 
     /**
@@ -96,44 +137,46 @@ class SliderController extends AdminController
      */
     public function update(Request $request, Slider $slider)
     {
-        $this->validate(request(),[
+     
+        $validator = Validator::make($request->all(), [
             'name' => 'required',
             'url' => 'required',
             // 'text' =>'required',
-            // 'image' => 'required',
-        ]);
-        if($request['image'])
-        {
-            if($slider->photos()->first())
-            {
-                unlink($slider->photos()->first()->path) or die('Delete Error');
-                $file = $request['image'];
+            'image' =>  'image|mimes:jpeg,png,jpg,gif|max:2048',
+		]);
+       
+
+        if($validator->passes()){ 
+
+            $form_data = array(
+                'name'       =>   $request->name,
+                'url'        =>   $request->url,
+                'text'        =>   $request->text,
+
+            );
+            $slider = Slider::find($request->hidden_id);
+            $u = $slider->update($form_data);
+
+       
+            $file = $request->file('image');
+            if($file != '')
+            {   
+                $old_photo = $slider->photos()->first();
+                unlink($old_photo->path);
                 $path = 'sliders/';
                 $image = $this->ImageResize($file,$path);
-            }
-            else
-            {
-                $file = $request['image'];
-                $path = 'sliders/';
-                $image = $this->ImageResize($file,$path);
-                $photo = new Photo;
-                $photo->path = $image;
-                $slider->photos()->save($photo);
-            }
-        }
-        else
-        {
-            $image = $slider->photos()->first()->path;
-        }
-        $photo = $slider->photos()->first();
-        $photo->path = $image;
-        $photo->save();
+                $old_photo->path = $image;
+                $old_photo->save();    
+                $pic = ['path'=>$image];            
+             }
+             $old = $slider->photos()->first()->path;
+             $pic = ['path'=>$old];
+               
+            return response()->json(['success' => 'اسلایدر موردنظرباموفقیت ویرایش شد.','slider'=>$slider,'pic'=>$pic]);
 
-        $data = $request->all();    
-        $slider->update($data);
+        }
+        return response(['errors'=>$validator->errors()->all()]);
 
-        session()->flash('msg','تغییرات  اسلایدر انجام شد');
-        return redirect(route('slider.index'));
     }
 
     /**
@@ -142,17 +185,18 @@ class SliderController extends AdminController
      * @param  \App\Models\Slider  $slider
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Slider $slider)
+    public function destroy($id)
     {
-        if($slider->photos()->first())
+        $l = Slider::find($id);
+        if($l->photos()->first())
         {
-            $photo = $slider->photos()->first();
-            unlink($slider->photos()->first()->path) or die('Delete Error');
+            $photo = $l->photos()->first();
+            unlink($l->photos()->first()->path) or die('Delete Error');
             $photo->delete();
+            
         }
-    
-        $slider->delete();
-        session()->flash('msg',' اسلایدر حذف شد');
-        return redirect()->back();
+
+        $slider = slider::where('id',$id)->delete();
+        return response()->json($slider);
     }
 }

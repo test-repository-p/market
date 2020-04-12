@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Information;
 use Illuminate\Http\Request;
+use Validator;
+
 
 class InformationController extends AdminController
 {
@@ -13,10 +15,10 @@ class InformationController extends AdminController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
-    {
-        $informations = Information::search($request->all());
-        return view('admin.information.index',compact('informations'));
+    public function index()
+    {    
+        $informations = Information::orderBy('id','desc')->paginate(5);
+        return view('admin.information.information',compact('informations'));
     }
 
     /**
@@ -26,7 +28,7 @@ class InformationController extends AdminController
      */
     public function create()
     {
-        return view('admin.information.create');
+        //
     }
 
     /**
@@ -37,22 +39,30 @@ class InformationController extends AdminController
      */
     public function store(Request $request)
     {
-        $this->validate(request(),[
-            'address' => 'required',
-            'telephone' => 'required',
-            'email' => 'required',
+        $validator = Validator::make($request->all(), [
+            'state' => 'required',
+            'address' => 'required|string',
+            'telephone' => 'required|numeric',
+            'email' => 'required|email',
+		]);
+        if($request->input('state') == 1){
+            $stat = array('msg' => 'فعال', 'status' => false);
+        }
+        elseif($request->input('state') == 2){
+            $stat = array('msg' => 'غیرفعال', 'status' => false); 
+        }
 
-        ]);
-        $information = Information::create([
-            'address' => $request['address'],
-            'telephone' => $request['telephone'],
-            'email' => $request['email'],
+        $arr = array('msg' => 'خطا!', 'status' => false);      
+        if($validator->passes()){ 
 
-        ]);
-
-
-        session()->flash('msg','ذخیره   اطلاعات جدید انجام شد');
-        return redirect(route('information.index'));
+            $information = Information::updateOrCreate(
+            ['id' => $request->value_id],
+            ['address'=>$request->address,'state'=>$request->state,'telephone'=>$request->telephone,'email'=>$request->email]
+        );     
+        $arr = array('msg' => 'باموفقیت انجام شد!', 'status' => true);
+        return response(["information"=>$information,"arr"=>$arr,"stat"=>$stat]);
+        }
+        return response(["arr"=>$arr,'errors'=>$validator->errors()->all()]);
     }
 
     /**
@@ -72,9 +82,11 @@ class InformationController extends AdminController
      * @param  \App\Models\Information  $information
      * @return \Illuminate\Http\Response
      */
-    public function edit(Information $information)
+    public function edit($id)
     {
-        return view('admin.information.edite',compact('information'));
+        $where = array('id' => $id);
+        $information  = Information::where($where)->first();
+        return response()->json($information);
     }
 
     /**
@@ -86,17 +98,7 @@ class InformationController extends AdminController
      */
     public function update(Request $request, Information $information)
     {
-        $this->validate(request(),[
-            'address' => 'required',
-            'telephone' => 'required',
-            'email' => 'required',
-
-        ]);
-        $data = $request->all();    
-        $information->update($data);
-
-        session()->flash('msg','تغییرات اطلاعات تماس انجام شد');
-        return redirect(route('information.index'));
+       //
     }
 
     /**
@@ -105,10 +107,9 @@ class InformationController extends AdminController
      * @param  \App\Models\Information  $information
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Information $information)
+    public function destroy($id)
     {
-        $information->delete();
-        session()->flash('msg','   اطلاعات تماس سایت حذف شد');
-        return redirect()->back();
+        $information = Information::where('id',$id)->delete();
+        return response()->json($information);
     }
 }

@@ -20,9 +20,9 @@ class ProductController extends AdminController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        $products = Product::search($request->all());
+        $products = Product::paginate(5);
         return view('admin.product.index',compact('products'));
     }
 

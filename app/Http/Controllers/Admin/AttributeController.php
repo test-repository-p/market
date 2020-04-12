@@ -5,18 +5,20 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Attribute;
 use Illuminate\Http\Request;
+use Redirect,Response;
 
-class AttributeController extends AdminController
+
+class AttributeController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        $attributes = Attribute::search($request->all());
-        return view('admin.attribute.index',compact('attributes'));
+        $data['attributes'] = Attribute::orderBy('id','desc')->paginate(8);
+        return view('admin.attribute.attribute',$data);
     }
 
     /**
@@ -26,7 +28,7 @@ class AttributeController extends AdminController
      */
     public function create()
     {
-        return view('admin.attribute.create');
+        //
     }
 
     /**
@@ -37,75 +39,60 @@ class AttributeController extends AdminController
      */
     public function store(Request $request)
     {
-        $this->validate(request(),[
-            'name' => 'required',
-            'title' => 'required',
-        ]);
-        $attribute = Attribute::create([
-            'name' => $request['name'],
-            'title' => $request['title'],
-            'parent_id' => 0,
-            
-        ]);
-      
-        
-        session()->flash('msg','ذخیره  ویژگی انجام شد');
-        return redirect(route('attribute.index'));
+        $attribute = Attribute::updateOrCreate(
+            ['id' => $request->value_id],
+            ['name' => $request->name, 'title' => $request->title]
+        );
+        return Response::json($attribute);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Attribute  $attribute
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Attribute $attribute)
+    public function show($id)
     {
+        $attribute = Attribute::find($id);
         return view('admin.attribute.show',compact('attribute'));
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Attribute  $attribute
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Attribute $attribute)
+    public function edit($id)
     {
-        return view('admin.attribute.edite',compact('attribute'));
+        $where = array('id' => $id);
+        $attribute  = Attribute::where($where)->first();
+ 
+        return Response::json($attribute);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Attribute  $attribute
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Attribute $attribute)
+    public function update(Request $request, $id)
     {
-        $this->validate(request(),[
-            'name' => 'required',
-            'title' => 'required',
-        ]);
-      
-        $data = $request->all();    
-        $attribute->update($data);
-
-        session()->flash('msg','تغییرات  ویژگی انجام شد');
-        return redirect(route('attribute.index'));
+        //
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Attribute  $attribute
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Attribute $attribute)
+    public function destroy($id)
     {
-        $attribute->delete();
-        session()->flash('msg','  ویژگی موردنظر حذف شد');
-        return redirect()->back();
+        $attribute = Attribute::where('id',$id)->delete();
+        return Response::json($attribute);
     }
 }

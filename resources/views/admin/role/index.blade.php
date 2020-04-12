@@ -73,7 +73,7 @@
                                     @foreach ($role->permissions as $permission)
                                     ({{ $permission->title }}),
                                     @endforeach
-                                    </td>
+                                </td>
                    
                                 <td>
                                 <a class="btn bg-blue" href="{{ route('role.edit',['role'=>$role->id]) }}" >

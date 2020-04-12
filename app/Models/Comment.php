@@ -4,9 +4,30 @@ namespace App\Models;
 
 use App\User;
 use Illuminate\Database\Eloquent\Model;
+use Nicolaslopezj\Searchable\SearchableTrait;
+
 
 class Comment extends Model
 {
+    use SearchableTrait;
+    protected $searchable = [
+        /**
+         *
+         * @var array
+         */
+        'columns' => [
+            'comments.comment' => 6,
+            'users.name' => 10,
+            'comments.id' => 2,
+            'comments.created_at' => 2,
+
+
+        ],
+        'joins' => [
+            'users' => ['comments.user_id','users.id'],
+        ],
+       
+    ];
     protected $fillable = [
         'user_id','product_id','comment','article_id',
     ];
@@ -22,19 +43,6 @@ class Comment extends Model
     {
         return $this->morphedByMany(Article::class,"commentable");
     }
-    public static function search($data)
-    {
-        $value = Comment::orderBy('id','DESC');
-        if(sizeof($data) > 0)
-        {
-            if(array_key_exists('comment',$data))
-            {
-                $value = $value->where('comment','like','%'.$data['comment'].'%');
-            }
-        }
-
-        $value = $value->paginate(10);
-        return $value;
-    }
+   
 
 }

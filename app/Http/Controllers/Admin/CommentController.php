@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Article;
 use App\Models\Comment;
 use App\Models\Product;
+use App\User;
+use Validator,Redirect,Response;
 use Illuminate\Http\Request;
 
 class CommentController extends Controller
@@ -17,8 +19,10 @@ class CommentController extends Controller
      */
     public function index(Request $request)
     {
-        $comments = Comment::search($request->all());
-        return view('admin.comment.index',compact('comments'));
+        $products = Product::get();
+        $articles = Article::get();
+        $comments = Comment::orderBy('id','desc')->paginate(5);
+        return view('admin.comment.comment',compact('comments','products','articles'));
     }
 
     /**
@@ -41,32 +45,58 @@ class CommentController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate(request(),[
-            'comment' => 'required',
-            // 'product_id' => 'required',
-            // 'article_id' => 'required',
+        // $this->validate(request(),[
+        //     'comment' => 'required',
+        //     // 'product_id' => 'required',
+        //     // 'article_id' => 'required',
 
-        ]);
-        $id = auth()->user()->id;
-        $comment = Comment::create([
-            'comment' => $request['comment'],
-            'user_id' => $id,
+        // ]);
+        // $id = auth()->user()->id;
+        // $comment = Comment::create([
+        //     'comment' => $request['comment'],
+        //     'user_id' => $id,
 
-        ]);
-        if($request['product_id'])
-        {
-            $comment->products()->sync($request->input('product_id'));
+        // ]);
+        // if($request['product_id'])
+        // {
+        //     $comment->products()->sync($request->input('product_id'));
 
-        }
-        elseif($request['article_id'])
-        {
-            $comment->articles()->sync($request->input('article_id'));
+        // }
+        // elseif($request['article_id'])
+        // {
+        //     $comment->articles()->sync($request->input('article_id'));
 
-        }
+        // }
       
 
-        session()->flash('msg','ذخیره  کامنت جدید انجام شد');
-        return redirect(route('comment.index'));
+        // session()->flash('msg','ذخیره  کامنت جدید انجام شد');
+        // return redirect(route('comment.index'));
+        
+        $validator = Validator::make($request->all(), [
+			'comment' => 'required|string',
+			'product_id' => 'required',
+		]);
+
+        $arr = array('msg' => 'خطا!', 'status' => false);
+        
+        if($validator->passes()){ 
+
+            $id = auth()->user()->id;
+            $comment = Comment::updateOrCreate(
+            ['id' => $request->value_id],
+            ['comment' => $request->comment,'user_id' => $id]
+        );
+       
+        $comment->products()->sync($request->input('product_id'));
+        $product = $comment->products->first();
+        $user = User::find($id);
+        $arr = array('msg' => 'باموفقیت انجام شد!', 'status' => true);
+
+        return response(["comment"=>$comment,"product"=>$product,"user"=>$user,"arr"=>$arr]);
+
+        }
+        return response(["arr"=>$arr,'errors'=>$validator->errors()->all()]);
+
     }
 
     /**
@@ -86,11 +116,23 @@ class CommentController extends Controller
      * @param  \App\Models\Comment  $comment
      * @return \Illuminate\Http\Response
      */
-    public function edit(Comment $comment)
+    public function edit($id)
     {
-        $products = Product::get();
-        $articles = Article::get();
-        return view('admin.comment.edite',compact('comment','products','articles'));
+        // $products = Product::get();
+        // $articles = Article::get();
+        // return view('admin.comment.edite',compact('comment','products','articles'));
+
+
+        $where = array('id' => $id);
+        $comment  = Comment::where($where)->first();
+        $pro = $comment->products->first()->id;
+        if($pro){
+            $select = ['id'=>$pro,'state'=>true];
+        }
+        else{
+            $select = ['id'=>'no','state'=>false];
+        }
+        return response()->json(['comment'=>$comment,'select'=>$select]);
     }
 
     /**
@@ -102,21 +144,21 @@ class CommentController extends Controller
      */
     public function update(Request $request, Comment $comment)
     {
-        $this->validate(request(),[
-            'comment' => 'required',
-            // 'product_id' => 'required',
-            // 'article_id' => 'required',
+        // $this->validate(request(),[
+        //     'comment' => 'required',
+        //     // 'product_id' => 'required',
+        //     // 'article_id' => 'required',
           
-        ]);
+        // ]);
        
-        $comment->products()->sync($request->input('commentable_id'));
+        // $comment->products()->sync($request->input('commentable_id'));
 
       
-        $data = $request->all();    
-        $comment->update($data);
+        // $data = $request->all();    
+        // $comment->update($data);
 
-        session()->flash('msg','تغییرات  کامنت انجام شد');
-        return redirect(route('comment.index'));
+        // session()->flash('msg','تغییرات  کامنت انجام شد');
+        // return redirect(route('comment.index'));
     }
 
     /**
@@ -125,11 +167,15 @@ class CommentController extends Controller
      * @param  \App\Models\Comment  $comment
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Comment $comment)
+    public function destroy($id)
     {
         
-        $comment->delete();
+        // $comment->delete();
+        // session()->flash('msg','  کامنت موردنظر حذف شد');
+        // return redirect()->back();
+
         session()->flash('msg','  کامنت موردنظر حذف شد');
-        return redirect()->back();
+        $comment = Comment::where('id',$id)->delete();
+        return response()->json($comment);
     }
 }

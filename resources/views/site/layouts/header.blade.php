@@ -165,14 +165,7 @@
                 @endauth
                 <!-- Mini Cart End-->
 
-                <!-- جستجو Start-->
-                <div class="col-table-cell col-lg-3 col-md-3 col-sm-6 col-xs-12 inner">
-                    <div id="search" class="input-group">
-                        <input id="filter_name" type="text" name="search" value="" placeholder="جستجو" class="form-control input-lg" />
-                        <button type="button" class="button-search"><i class="fa fa-search"></i></button>
-                    </div>
-                </div>
-                <!-- جستجو End-->
+               @include('site.layouts.search')
             </div>
         </div>
     </header>

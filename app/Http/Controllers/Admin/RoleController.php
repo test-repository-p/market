@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use App\Models\Role;
+use Validator;
 use Illuminate\Http\Request;
 
 class RoleController extends AdminController
@@ -16,9 +17,9 @@ class RoleController extends AdminController
      */
     public function index(Request $request)
     {
-        $roles = Role::search($request->all());
+        $roles = Role::orderBy('id','desc')->paginate(5);
         $permissions = Permission::get();
-        return view('admin.role.index',compact('roles','permissions'));
+        return view('admin.role.role',compact('roles','permissions'));
     }
 
     /**
@@ -28,8 +29,7 @@ class RoleController extends AdminController
      */
     public function create()
     {
-        $permissions = Permission::get();
-        return view('admin.role.create',compact('permissions'));
+        //
         
     }
 
@@ -41,17 +41,27 @@ class RoleController extends AdminController
      */
     public function store(Request $request)
     {
-        $this->validate(request(),[
-            'name' => 'required',
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string',
             'title' => 'required',
-        ]);
-        $role = Role::create([
-            'name' => $request['name'],
-            'title' => $request['title'],
-        ]);
+            'permission_id' => 'required',
+		]);
+       
+
+        $arr = array('msg' => 'خطا!', 'status' => false);      
+        if($validator->passes()){ 
+
+            $role = Role::updateOrCreate(
+            ['id' => $request->value_id],
+            ['name'=>$request->name,'title'=>$request->title]
+        );  
         $role->permissions()->sync($request->input('permission_id'));
-        session()->flash('msg','ذخیره سطح دسترسی جدید انجام شد');
-        return redirect(route('role.index'));
+        $permissions = $role->permissions;
+        $arr = array('msg' => 'باموفقیت انجام شد!', 'status' => true);
+        return response(["role"=>$role,"arr"=>$arr,'permissions'=>$permissions]);
+        }
+        return response(["arr"=>$arr,'errors'=>$validator->errors()->all()]);
     }
 
     /**
@@ -72,10 +82,13 @@ class RoleController extends AdminController
      * @param  \App\Models\Role  $role
      * @return \Illuminate\Http\Response
      */
-    public function edit(Role $role)
+    public function edit($id)
     {
-        $permissions = Permission::get();
-        return view('admin.role.edite',compact('role','permissions'));
+        $where = array('id' => $id);
+        $role  = Role::where($where)->first();
+        $select[] = $role->permissions()->pluck('id');
+
+        return response()->json(['role'=>$role,'select'=>$select]);
     }
 
     /**
@@ -87,16 +100,7 @@ class RoleController extends AdminController
      */
     public function update(Request $request, Role $role)
     {
-        $this->validate(request(),[
-            'name' => 'required',
-            'title' => 'required',
-        ]);
-        $data = $request->all();    
-        $role->update($data);
-        $role->permissions()->sync($request->input('permission_id'));
-
-        session()->flash('msg','تغییرات سطح دسترسی انجام شد');
-        return redirect(route('role.index'));
+       //
     }
 
     /**
@@ -105,10 +109,9 @@ class RoleController extends AdminController
      * @param  \App\Models\Role  $role
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Role $role)
+    public function destroy($id)
     {
-        $role->delete();
-        session()->flash('msg',' سطح دسترسی موردنظر حذف شد');
-        return redirect()->back();
+        $role = Role::where('id',$id)->delete();
+        return response()->json($role);
     }
 }

@@ -7,6 +7,8 @@ use App\Models\Category;
 use App\Models\Photo;
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Redirect,Response;
+
 
 class CategoryController extends AdminController
 {
@@ -15,11 +17,11 @@ class CategoryController extends AdminController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        $categorys = Category::search($request->all());
+        $categorys = Category::orderBy('id','desc')->paginate(5);
         $tags = Tag::get();
-        return view('admin.category.index',compact('categorys','tags'));
+        return view('admin.category.category',compact('categorys','tags'));
     }
 
     /**
@@ -29,8 +31,7 @@ class CategoryController extends AdminController
      */
     public function create()
     {
-        $tags = Tag::get();
-        return view('admin.category.create',compact('tags'));
+        //
     }
 
     /**
@@ -41,20 +42,15 @@ class CategoryController extends AdminController
      */
     public function store(Request $request)
     {
-        $this->validate(request(),[
-            'name' => 'required',
-            'title' => 'required',
-        ]);
-        $category = Category::create([
-            'name' => $request['name'],
-            'title' => $request['title'],
 
-        ]);
+        $category = Category::updateOrCreate(
+            ['id' => $request->value_id],
+            ['name' => $request->name, 'title' => $request->title]
+        );
+         $category->tags()->sync($request->input('tag_id'));
+         $tags = $category->tags;
 
-        $category->tags()->sync($request->input('tag_id'));
-
-        session()->flash('msg','ذخیره  دسته بندی جدید انجام شد');
-        return redirect(route('category.index'));
+        return response(["category"=>$category,"tags"=>$tags]);
     }
 
     /**
@@ -75,10 +71,12 @@ class CategoryController extends AdminController
      * @param  \App\Models\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function edit(Category $category)
+    public function edit($id)
     {
-        $tags = Tag::get();
-        return view('admin.category.edite',compact('category','tags'));
+
+        $where = array('id' => $id);
+        $category  = Category::where($where)->first();
+        return response()->json($category);
     }
 
     /**
@@ -90,17 +88,7 @@ class CategoryController extends AdminController
      */
     public function update(Request $request, Category $category)
     {
-        $this->validate(request(),[
-            'name' => 'required',
-            'title' => 'required',
-        ]);
-
-        $category->tags()->sync($request->input('tag_id'));
-        $data = $request->all();    
-        $category->update($data);
-
-        session()->flash('msg','تغییرات  دسته بندی موردنظر انجام شد');
-        return redirect(route('category.index'));
+        //
     }
 
     /**
@@ -109,15 +97,10 @@ class CategoryController extends AdminController
      * @param  \App\Models\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Category $category)
+    public function destroy($id)
     {
-        if($category->tags()->first())
-        {
-            $tag = $category->tags()->first();
-            $tag->delete();
-        }
-        $category->delete();
-        session()->flash('msg','  دسته بندی موردنظر حذف شد');
-        return redirect()->back();
+       
+        $category = Category::where('id',$id)->delete();
+        return response()->json($category);
     }
 }

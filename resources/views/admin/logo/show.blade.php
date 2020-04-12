@@ -39,7 +39,7 @@
           <th>تصویر</th>
           <td>
             @if($logo->photos()->first())
-            <img src="/{{ $logo->photos()->first()->path }}" style="max-width:60px;max-height:60px;height: auto;float: right;">
+            <img src="/{{ $logo->photos()->first()->path }}" style="width:260px;height:160px;height: auto;float: right;">
             @endif
           </td>
         </tr>
