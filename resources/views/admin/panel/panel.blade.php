@@ -1,35 +1,35 @@
 @extends('admin.layouts.app')
 @section('title')
-    <title>مدیریت کاربران هپی مارکت</title>
+    <title>پنل کاربری {{$user->name}}</title>
 @endsection
 @section('header-title')
 <section class="content-header">
+    <h1>
+      داشبرد
+      <small> پروفایل</small>
+    </h1>
     <ol class="breadcrumb">
-        <li><a href="{{ Route('home') }}"><i class="fa fa-dashboard"></i> خانه</a></li>
-        <li class="active">  کاربران</li>
+      <li><a href="{{ Route('home') }}"><i class="fa fa-dashboard"></i> خانه</a></li>
+      <li class="active">پنل کاربری</li>
     </ol>
-</section>
+  </section>
 @endsection
+
 
 @section('content')
 <section class="content">
 
    
 
-    <div class="col-md-9">
-        <button type="button" name="create_record" id="create_record" class="btn btn-app bg-green" disabled >
-            <i class="fa fa-save "></i> افزودن
-        </button>
-    </div>
 
     <div class="row">
         <div class="col-xs-12">
             <div class="box">
                 <div class="box-header">
-                    <h3 class="box-title">لیست  کاربران وب سایت </h3>
+                    <h3 class="box-title">   پروفایل {{$user->name}}  </h3>
 
                     {{-- search box --}}
-                    <div class="box-tools">
+                    {{-- <div class="box-tools">
                         <form method="GET" action="{{ route('searchadmin') }}" class="input-group input-group-sm"
                             style="width: 150px;">
                             <input type="text" name="query" value="{{ request()->input('query') }}"
@@ -39,11 +39,10 @@
                                 <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
                             </div>
                         </form>
-                    </div>
+                    </div> --}}
                     {{-- //search box --}}
                 </div>
 
-                {{-- <div class="table-responsive"> --}}
                 <div class="box-body table-responsive no-padding">
 
                     <table class="table table-hover" id="val_table">
@@ -54,49 +53,50 @@
                                 <th>ایمیل </th>
                                 <th>تصویر</th>
                                 <th>سطح دسترسی ها </th>
-                                <td colspan="2">عملیات</td>
+                                <th >ویرایش نام </th>
+                                <th>حذف تصویر</th>
                             </tr>
                         </thead>
                         <tbody id="values-crud">
-                            @foreach($users as $u_info)
-                            <tr id="value_id_{{ $u_info->id }}">
-                                <td>{{ $u_info->id  }}</td>
+                            <tr id="value_id_{{ $user->id }}">
+                                <td>{{ $user->id  }}</td>
                                 
                                 <td>
-                                    <a href="{{ route('user.show',['user'=>$u_info->id]) }}">{{ $u_info->name }}</a>
+                                    <a href="#">{{ $user->name }}</a>
                                 </td>
                                 <td>
-                                    {{ $u_info->email}}
+                                    {{ $user->email}}
                                 </td>
                                 <td>
-                                    @if($u_info->photos()->first())
-                                    <img src="/{{ $u_info->photos()->first()->path }}"
+                                    @if($user->photos()->first())
+                                    <img src="/{{ $user->photos()->first()->path }}"
                                         style="width:100px;height:100px;height: auto;float: right;">
                                     @endif
                                 </td>
                                 <td>
-                                    @foreach ($u_info->roles as $role)
+                                    @foreach ($user->roles as $role)
                                     ({{ $role->title }}),
                                     @endforeach
                                 </td>
 
-                                <td colspan="2">
-                                    <a href="javascript:void(0)" id="edit-value" name="edit" data-id="{{ $u_info->id }}"
+                                <td>
+                                    <a href="javascript:void(0)" id="edit-value" name="edit" data-id="{{ $user->id }}"
                                         class="edit btn btn-info mr-2">
                                         <i class="fa fa-edit"></i>
-                                    </a> &nbsp;
-                                    <a href="javascript:void(0)" id="delete-value" data-id="{{ $u_info->id }}"
-                                        class="delete btn btn-danger delete-value">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
-
+                                    </a> 
                                 </td>
+
+                                    <td>
+                                        <a href="javascript:void(0)" id="delete-value" data-id="{{ $user->id }}"
+                                            class="delete btn btn-danger delete-value">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    </td>
+                                                              
                             </tr>
-                            @endforeach
                         </tbody>
                     </table>
                 </div>
-                {{ $users->links() }}
 
             </div>
         </div>
@@ -121,7 +121,7 @@
                     <div class="form-group">
                         <label class="control-label col-md-4"> نام : </label>
                         <div class="col-md-8">
-                            <input type="text" name="name" id="name" class="form-control" disabled />
+                            <input type="text" name="name" id="name" class="form-control"  />
                         </div>
                     </div>
                     <div class="form-group">
@@ -131,16 +131,28 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="control-label col-md-4">سطح دسترسی </label>
+                    {{-- <div class="form-group">
+                        <label class="control-label col-md-4">پسورد  : </label>
                         <div class="col-md-8">
-                        <select class="form-control" id="role_id" name="role_id[]" multiple>
-                          @foreach ($roles as $role)  
-                          <option value="{{ $role->id }}">{{ $role->title }}</option>
-                          @endforeach
-                        </select>
+                            <input type="password" name="current_password" id="current_password" class="form-control"  />
                         </div>
-                      </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4">پسورد جدید : </label>
+                        <div class="col-md-8">
+                            <input type="password" name="password" id="password" class="form-control"  />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4">تکرارپسورد : </label>
+                        <div class="col-md-8">
+                            <input type="password" name="confirmation " id="confirmation " class="form-control"  />
+                        </div>
+                    </div> --}}
+
+                
 
                     <div class="form-group">
                         <label class="control-label col-md-4">تصویرپروفایل : </label>
@@ -170,7 +182,7 @@
                 <h2 class="modal-title" id="confirmTitle"></h2>
             </div>
             <div class="modal-body">
-                <h4 align="center" style="margin:0;">آیابرای حذف اطمینان هستید؟</h4>
+                <h4 align="center" style="margin:0;">آیابرای حذف تصویراطمینان دارید؟</h4>
             </div>
             <div class="modal-footer"  >
                 <button style="float:left;" type="button" name="ok_button" id="ok_button" class="btn btn-danger">OK</button>
@@ -190,66 +202,13 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-        // $('#create_record').click(function() {
-        //     $('#sample_form')[0].reset();
-        //     $('#store_image').html('');
-        //     $('#passwordS').show();
-
-        //     $('#modalTitle').text("افزودن کاربر جدید");
-        //     $('#action_button').val("افزودن");
-        //     $('#action').val("Add");
-        //     $('#formModal').modal('show');
-        // });
+     
         $('#sample_form').on('submit', function(event) {
             event.preventDefault();
-            // if ($('#action').val() == 'Add') {
-            //     $.ajax({
-            //         url: "{{ route('user.store') }}",
-            //         method: "POST",
-            //         data: new FormData(this),
-            //         contentType: false,
-            //         cache: false, 
-            //         processData: false,
-            //         dataType: "json",
-            //         success: function(data) {
-            //             var html = '';
-            //             if (data.errors) {
-            //                 html = '<div class="alert alert-danger">';
-            //                 for (var count = 0; count < data.errors.length; count++) {
-            //                     html += '<p>' + data.errors[count] + '</p>';
-            //                 }
-            //                 html += '</div>';
-            //             }
-            //             if (data.success) {
-            //                 html = '<div class="alert alert-success">' + data.success +
-            //                     '</div>';
-            //                 $('#sample_form')[0].reset();
-            //                 var value = '<tr id="value_id_' + data.user.id + '"><td>' + data
-            //                     .user.id + '</td></td><td> <a  href="/admin/user/' + data.user.id +
-            //                     '">' + data.user.name + '</a></td><td>' + data.user.email +
-            //                     '</td><td><img src="/' + data.pic.path +
-            //                     '" />';
-            //                 value +=
-            //                     '<td colspan="2"><a href="javascript:void(0)" id="edit-value" data-id="' +
-            //                     data.user.id +
-            //                     '" class="btn btn-info mr-2"><i class="fa fa-edit"></i></a> &nbsp;';
-            //                 value +=
-            //                     ' <a href="javascript:void(0)" id="delete-value" data-id="' +
-            //                     data.user.id +
-            //                     '" class="btn btn-danger delete-value ml-1"><i class="fa fa-trash"></i></a></td></tr>';
-            //                 $('#values-crud').prepend(value);
-            //                 // $('#valueForm').trigger("reset");
-            //             }
-            //             $('#form_result').html(html);
-            //         }
-            //     })
-            // }
-
-
             
             if ($('#action').val() == "Edit") {
                 $.ajax({
-                    url: "{{ route('user.update') }}",
+                    url: "{{ route('panel.update') }}",
                     method: "POST",
                     data: new FormData(this),
                     contentType: false,
@@ -268,22 +227,9 @@
                         if (data.success) {
                             html = '<div class="alert alert-success">' + data.success +
                                 '</div>';
-                                var value = '<tr id="value_id_' + data.user.id + '"><td>' + data
-                                .user.id + '</td></td><td> <a  href="/admin/user/' + data.user.id +
-                                '">' + data.user.name + '</a></td><td>' + data.user.email +
-                                '</td><td><img src="/' + data.pic.path +
-                                '" />';
-                            value +=
-                                '<td colspan="2"><a href="javascript:void(0)" id="edit-value" data-id="' +
-                                data.user.id +
-                                '" class="btn btn-info mr-2"><i class="fa fa-edit"></i></a> &nbsp;';
-                            value +=
-                                ' <a href="javascript:void(0)" id="delete-value" data-id="' +
-                                data.user.id +
-                                '" class="btn btn-danger delete-value ml-1"><i class="fa fa-trash"></i></a></td></tr>';
+                                
                             $('#sample_form')[0].reset();
                             $('#store_image').html('');
-                            $("#value_id_" + data.user.id).replaceWith(value);
                         }
                         $('#form_result').html(html);
                         window.location.reload();
@@ -296,12 +242,12 @@
             var id = $(this).data('id');
             $('#form_result').html('');
             $.ajax({
-                url: "{{ url('admin/user')}}" + '/' + id + '/edit',
+                url: "{{ url('admin/panel')}}" + '/' + id + '/edit',
                 dataType: "json",
                 success: function(html) {
                     $('#name').val(html.data.name);
                     $('#email').val(html.data.email);
-                    // $('#passwordS').hide();
+                    // $('#current_password').val(html.data.password);
                     $('#store_image').html("<img src=/" + html.pic.path +
                         " width='70' class='img-thumbnail' />");
                     $('#store_image').append(
@@ -318,16 +264,15 @@
         $('body').on('click', '.delete', function() {
             var val_id = $(this).data('id');
             $('#confirmModal').modal('show');
-            $('#confirmTitle').html("حذف کاربر شماره" + val_id);
+            $('#confirmTitle').html("حذف تصویر کاربر شماره" + val_id);
             $('#ok_button').click(function() {
                 $.ajax({
                     type: "DELETE",
-                    url: "{{ url('admin/user')}}" + '/' + val_id,
+                    url: "{{ url('admin/panel')}}" + '/' + val_id,
                     beforeSend: function() {
                         $('#ok_button').text('Deleting...');
                     },
                     success: function(data) {
-                        $("#value_id_" + val_id).remove();
                         window.location.reload();
                     },
                     error: function(data) {

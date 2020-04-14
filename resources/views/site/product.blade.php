@@ -160,10 +160,11 @@
                 <!-- AddThis Button END -->
             </div>
         </div>
+        <?php  $comment = $product->comments->where('status','1'); ?>
         <ul class="nav nav-tabs">
             <li class="active"><a href="#tab-description" data-toggle="tab">توضیحات</a></li>
             <li><a href="#tab-specification" data-toggle="tab">مشخصات</a></li>
-            <li><a href="#tab-review" data-toggle="tab">نظرات ({{count($product->comments)}})</a></li>
+            <li><a href="#tab-review" data-toggle="tab">نظرات ({{count($comment)}})</a></li>
         </ul>
         <div class="tab-content">
             <div itemprop="description" id="tab-description" class="tab-pane active">
@@ -239,7 +240,7 @@
             <div id="tab-review" class="tab-pane">
                 <div id="review">
                     <div>
-                        @foreach ($product->comments as $item)
+                        @foreach ($comment as $item)
 
                         <table class="table table-striped table-bordered">
                             <tbody>

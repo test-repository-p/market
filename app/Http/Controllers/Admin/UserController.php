@@ -104,8 +104,18 @@ class UserController extends AdminController
         if(request()->ajax())
         {
             $data = User::findOrFail($id);
-            $image = $data->photos()->first()->path;
-            $pic = ['path'=>$image];
+            if($data->photos()->first()){
+
+                $old = $data->photos()->first()->path;
+                $pic = ['path'=>$old];
+             }else{
+                $old = "uploads/users/1585205390.jpg";
+                $pic = ['path'=>$old];
+             }
+            
+
+            // $image = $data->photos()->first()->path;
+            // $pic = ['path'=>$image];
             return response()->json(['data' => $data,'pic'=>$pic]);
         }
     }
@@ -182,16 +192,36 @@ class UserController extends AdminController
             $file = $request->file('image');
             if($file != '')
             {   
-                $old_photo = $user->photos()->first();
-                unlink($old_photo->path);
-                $path = 'users/';
-                $image = $this->ImageResize_user($file,$path);
-                $old_photo->path = $image;
-                $old_photo->save();    
-                $pic = ['path'=>$image];            
+                if($user->photos()->first()){
+
+                    $old_photo = $user->photos()->first();
+                    unlink($old_photo->path);
+                    $path = 'users/';
+                    $image = $this->ImageResize_user($file,$path);
+                    $old_photo->path = $image;
+                    $old_photo->save();    
+                    $pic = ['path'=>$image]; 
+                }  
+                else
+                {
+                    $file = $request['image'];
+                    $path = 'users/';
+                    $image = $this->ImageUploader($file,$path);
+                    $photo = new Photo;
+                    $photo->path = $image;
+                    $u = $user->photos()->save($photo);
+                    $pic = ['path'=>$image]; 
+
+                }         
              }
-             $old = $user->photos()->first()->path;
+             if($user->photos()->first()){
+
+                $old = $user->photos()->first()->path;
+                $pic = ['path'=>$old];
+             }
+             $old = "uploads/users/1585205390.jpg";
              $pic = ['path'=>$old];
+            
                
             return response()->json(['success' => 'کاربر موردنظرباموفقیت ویرایش شد.','user'=>$user,'pic'=>$pic]);
 

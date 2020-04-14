@@ -48,12 +48,12 @@ class PermissionController extends AdminController
         $arr = array('msg' => 'خطا!', 'status' => false);      
         if($validator->passes()){ 
 
-            $information = Permission::updateOrCreate(
+            $permission = Permission::updateOrCreate(
             ['id' => $request->value_id],
             ['name'=>$request->name,'title'=>$request->title]
         );     
         $arr = array('msg' => 'باموفقیت انجام شد!', 'status' => true);
-        return response(["information"=>$information,"arr"=>$arr]);
+        return response(["permission"=>$permission,"arr"=>$arr]);
         }
         return response(["arr"=>$arr,'errors'=>$validator->errors()->all()]);
     }
@@ -78,8 +78,8 @@ class PermissionController extends AdminController
     public function edit($id)
     {
         $where = array('id' => $id);
-        $information  = Permission::where($where)->first();
-        return response()->json($information);
+        $permission  = Permission::where($where)->first();
+        return response()->json($permission);
     }
 
     /**
@@ -102,7 +102,7 @@ class PermissionController extends AdminController
      */
     public function destroy($id)
     {
-        $information = Permission::where('id',$id)->delete();
-        return response()->json($information);
+        $permission = Permission::where('id',$id)->delete();
+        return response()->json($permission);
     }
 }

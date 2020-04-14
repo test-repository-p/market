@@ -50,6 +50,7 @@ class CommentController extends Controller
         $comment = Comment::create([
             'comment' => $request['comment'],
             'user_id' => $id,
+            'status' => '0',
 
         ]);
         if($request['product_id'])

@@ -29,7 +29,7 @@ class Comment extends Model
        
     ];
     protected $fillable = [
-        'user_id','product_id','comment','article_id',
+        'user_id','product_id','comment','article_id','status',
     ];
     public function user()
     {

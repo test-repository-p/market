@@ -10,14 +10,14 @@ use App\User;
 use Validator,Redirect,Response;
 use Illuminate\Http\Request;
 
-class CommentController extends Controller
+class CommentController extends AdminController
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
         $products = Product::get();
         $articles = Article::get();
@@ -32,9 +32,7 @@ class CommentController extends Controller
      */
     public function create()
     {
-        $products = Product::get();
-        $articles = Article::get();
-        return view('admin.comment.create',compact('products','articles'));
+       //
     }
 
     /**
@@ -45,54 +43,40 @@ class CommentController extends Controller
      */
     public function store(Request $request)
     {
-        // $this->validate(request(),[
-        //     'comment' => 'required',
-        //     // 'product_id' => 'required',
-        //     // 'article_id' => 'required',
-
-        // ]);
-        // $id = auth()->user()->id;
-        // $comment = Comment::create([
-        //     'comment' => $request['comment'],
-        //     'user_id' => $id,
-
-        // ]);
-        // if($request['product_id'])
-        // {
-        //     $comment->products()->sync($request->input('product_id'));
-
-        // }
-        // elseif($request['article_id'])
-        // {
-        //     $comment->articles()->sync($request->input('article_id'));
-
-        // }
-      
-
-        // session()->flash('msg','ذخیره  کامنت جدید انجام شد');
-        // return redirect(route('comment.index'));
         
         $validator = Validator::make($request->all(), [
 			'comment' => 'required|string',
-			'product_id' => 'required',
+			'status' => 'required',
 		]);
 
         $arr = array('msg' => 'خطا!', 'status' => false);
         
         if($validator->passes()){ 
 
-            $id = auth()->user()->id;
-            $comment = Comment::updateOrCreate(
-            ['id' => $request->value_id],
-            ['comment' => $request->comment,'user_id' => $id]
+        $comment = Comment::find($request->value_id);
+
+        $form_data = array(
+            'comment'       =>   $request->comment,
+            'status'        =>   $request->status,
+            'user_id'        =>   $comment->user_id,
         );
+        $u = $comment->update($form_data);
+        
+        if($comment->products->first())
+        {
+            $val = $comment->products->first()->name;
+        }elseif($comment->articles->first())
+        {
+            $val = $comment->articles->first()->title;
+
+        }
+        $item = ['name'=>$val];
        
-        $comment->products()->sync($request->input('product_id'));
-        $product = $comment->products->first();
-        $user = User::find($id);
+        $user = $comment->user->first()->name;
+         
         $arr = array('msg' => 'باموفقیت انجام شد!', 'status' => true);
 
-        return response(["comment"=>$comment,"product"=>$product,"user"=>$user,"arr"=>$arr]);
+        return response(["comment"=>$comment,"item"=>$item,"user"=>$user,"arr"=>$arr]);
 
         }
         return response(["arr"=>$arr,'errors'=>$validator->errors()->all()]);
@@ -118,21 +102,35 @@ class CommentController extends Controller
      */
     public function edit($id)
     {
-        // $products = Product::get();
-        // $articles = Article::get();
-        // return view('admin.comment.edite',compact('comment','products','articles'));
-
 
         $where = array('id' => $id);
         $comment  = Comment::where($where)->first();
-        $pro = $comment->products->first()->id;
-        if($pro){
-            $select = ['id'=>$pro,'state'=>true];
+        if($comment->products->first()){
+            $val = $comment->products->first()->name;
+        }elseif($comment->articles->first()){
+            $val = $comment->articles->first()->title;
+
         }
-        else{
-            $select = ['id'=>'no','state'=>false];
-        }
-        return response()->json(['comment'=>$comment,'select'=>$select]);
+        $item = ['name'=>$val];
+
+        return response()->json(['comment'=>$comment,'item'=>$item]);
+
+
+
+
+
+
+
+
+        // if($comment->products->first()){
+            
+        //     $pro = $comment->products->first()->id;
+        //     $select = ['id'=>$pro,'status'=>true];
+        // }
+        // else{
+        //     $select = ['status'=>false];
+        // }
+        // return response()->json(['comment'=>$comment,'select'=>$select]);
     }
 
     /**

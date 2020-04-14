@@ -38,7 +38,6 @@ Route::group(['namespace'=>'Admin','middleware'=>['auth','UserLevel'],'prefix'=>
         Route::resource('attributevalue','AttributevalueController');   
 
         Route::resource('article','ArticleController');  
-        Route::resource('panel','PanleController');
 
 
 
@@ -63,6 +62,11 @@ Route::group(['namespace'=>'Admin','middleware'=>['auth','UserLevel'],'prefix'=>
         Route::resource('slider','SliderController');
         Route::post('slider/update', 'SliderController@update')->name('slider.update');
         Route::get('slider/destroy/{id}', 'SliderController@destroy');  
+
+        Route::resource('panel','PanleController');
+        Route::post('panel/update', 'PanleController@update')->name('panel.update');
+        Route::get('panel/destroy/{id}', 'PanleController@destroy');  
+
         
 
 

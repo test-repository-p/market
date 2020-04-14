@@ -1,7 +1,7 @@
-@extends('admin.layouts.app')
+{{-- @extends('admin.layouts.app') --}}
 
 
-@section('header-title')
+{{-- @section('header-title') --}}
 <section class="content-header">
     <h1>
       داشبرد
@@ -12,15 +12,15 @@
       <li class="active">پنل کاربری</li>
     </ol>
   </section>
-@endsection
+{{-- @endsection --}}
 
-@section('content')
-
-
+{{-- @section('content') --}}
 
 
 
 
 
 
-@endsection
+
+
+{{-- @endsection --}}

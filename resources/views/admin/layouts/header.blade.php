@@ -235,7 +235,9 @@
                 @endif
                 <p>
                     {{ auth()->user()->name }}
-                  <small>مدیریت کل سایت</small>
+                    @if(auth()->user()->roles->first())
+                  <small>{{ auth()->user()->roles->first()->title }}</small>
+                  @endif
                 </p>
               </li>
               <!-- Menu Body -->

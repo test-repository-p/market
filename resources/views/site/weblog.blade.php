@@ -55,8 +55,13 @@
         <div class="product-layout product-list col-xs-12">
             <div class="product-thumb">
                 <div class="image">
-                    <a href="{{ url('site/weblog/'.$item->id) }}"><img src="/{{ $item->photos()->first()->path }} " width="300px" height="200px" alt=" {{ $item->title }}  "
-                            title=" {{ $item->title }}  " class="img-responsive" /></a>
+                    <a href="{{ url('site/weblog/'.$item->id) }}">
+                    @if($item->photos()->first())
+                        <img src="/{{ $item->photos()->first()->path }} " width="300px" height="200px" alt=" {{ $item->title }}  "
+                            title=" {{ $item->title }}  " class="img-responsive" />
+                            @endif
+                        
+                        </a>
                 </div>
                 <div>
                     <div class="caption">

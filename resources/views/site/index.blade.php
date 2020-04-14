@@ -95,7 +95,7 @@
                         @if($item->product)
                         <div class="product-thumb">
                             <div class="image">
-                            <a href="product.html"><img src="/{{ $item->product->photos()->first()->path }}" alt="{{ $item->product->name }}" title="{{ $item->product->name }}" class="img-responsive" /></a>
+                            <a href="{{ url('site/element/'.$item->product->id) }}"><img src="/{{ $item->product->photos()->first()->path }}" alt="{{ $item->product->name }}" title="{{ $item->product->name }}" class="img-responsive" /></a>
                             </div>
                             <div class="caption">
                             <h4><a href="product.html">{{ $item->product->name }}</a></h4>
@@ -103,7 +103,7 @@
                                     <?php
                                     $a = 100-$item->product->discount;
                                     $newPrice = ($item->product->price/100)*$a;?>{{ number_format($newPrice) }} تومان</span> 
-                                    @if($item->discount != 0)
+                                    @if($item->product->discount != 0)
                                     <span class="price-old">{{ $item->product->price }} تومان</span> 
                                     <span class="saving">-{{ $item->product->discount }}%</span>
                                     @endif
@@ -147,7 +147,7 @@
     <!-- Banner End -->
 
  <!-- Brand محصولات Slider Start-->
- {{-- <h3 class="subtitle"> محصولات {{ $men->first()->category->title }} - <a class="viewall" href="{{ url('site/cat/'.$men->first()->category_id) }}">نمایش همه</a></h3> --}}
+ <h3 class="subtitle"> محصولات {{ $men->first()->category->title }} - <a class="viewall" href="{{ url('site/cat/'.$men->first()->category_id) }}">نمایش همه</a></h3>
  <div class="owl-carousel latest_brands_carousel">
     @foreach ($men as $item)    
     <div class="product-thumb">

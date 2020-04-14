@@ -79,9 +79,10 @@
             <hr>
         </div>
     </div>
+    <?php  $comment = $article->comments->where('status','1'); ?>
     <ul class="nav nav-tabs">
         <li class="active"><a href="#tab-description" data-toggle="tab">توضیحات</a></li>
-        <li><a href="#tab-review" data-toggle="tab">نظرات ({{count($article->comments)}})</a></li>
+        <li><a href="#tab-review" data-toggle="tab">نظرات ({{count($comment)}})</a></li>
     </ul>
     <div class="tab-content">
         <div itemprop="description" id="tab-description" class="tab-pane active">
@@ -107,7 +108,7 @@
             {{-- <form class="form-horizontal"> --}}
                 <div id="review">
                     <div>
-                        @foreach ($article->comments as $item)
+                        @foreach ($comment as $item)
 
                         <table class="table table-striped table-bordered">
                             <tbody>
@@ -179,8 +180,12 @@
         @foreach ($art_cat as $item)
         <div class="product-thumb">
             <div class="image">
-                <a href="{{ url('site/weblog/'.$item->id) }}"><img src="/{{ $item->photos()->first()->path }}"
-                        alt="{{ $item->title }}" title="{{ $item->title }} " class="img-responsive" /></a>
+                <a href="{{ url('site/weblog/'.$item->id) }}">
+                    @if($item->photos()->first())
+                    <img src="/{{ $item->photos()->first()->path }}"
+                        alt="{{ $item->title }}" title="{{ $item->title }} " class="img-responsive" />
+                    @endif
+                    </a>
             </div>
             <div class="caption">
                 <h4><a href="{{ url('site/weblog/'.$item->id) }}">{{ $item->title }} </a></h4>

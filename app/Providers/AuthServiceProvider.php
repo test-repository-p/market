@@ -27,12 +27,37 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
+        Gate::define('edite_comment_product',function($user,$comment){
+            foreach($user->roles as $role){
+                if($role->name == 'Producer' || $role->name == 'Super_Admin'){
+                    if($comment->products->first()){
+
+                    return true;
+                    }
+
+                }
+            }
+        });
+
+        Gate::define('edite_comment_article',function($user,$comment){
+            
+            foreach($user->roles as $role){
+                if($role->name == 'Author' || $role->name == 'Super_Admin'){
+                    if($comment->articles->first()){
+                        return true;
+                    }    
+                }
+                
+            }
+        });
+
         foreach($this->getPermission() as $permission)
         {
             Gate::define($permission->name,function($user) use ($permission){
             return $user->hasRole($permission->roles);
         });
         }
+        
         
     }
     public function getPermission()
